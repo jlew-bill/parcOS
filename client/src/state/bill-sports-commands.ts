@@ -165,6 +165,50 @@ export const billSportsCommands = {
     store.addCard(card);
     store.setFocusedCard(card.id);
     return card;
+  },
+
+  /**
+   * Create a highlight reel card
+   */
+  createHighlightCard: (game: GameCard) => {
+    const store = useParcOSStore.getState();
+    const maxZ = Math.max(...Object.values(store.cards).map(c => c.position.z), 0);
+    
+    // Get existing highlights for this game or generate mock ones if none exist
+    let highlights = store.highlights.filter(h => h.gameId === game.id);
+    
+    // Mock generation if no real highlights yet (for demo)
+    if (highlights.length === 0) {
+      console.log('No highlights found, waiting for engine...');
+      // In a real app we might trigger a fetch here
+    }
+
+    const card = {
+      id: nanoid(),
+      type: 'card' as const,
+      title: `${game.league} Highlights: ${game.homeTeam.team} vs ${game.awayTeam.team}`,
+      appId: 'sports-multiview', // Reuse multiview but with different payload
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      cmfk: { correctness: 0.9, misconception: 0, fog: 0.1, knowingness: 0.95 },
+      metadata: { gameId: game.id, cardType: 'highlights' },
+      position: {
+        x: 400 + Math.random() * 100,
+        y: 300 + Math.random() * 100,
+        z: maxZ + 1
+      },
+      size: { width: 400, height: 600 },
+      layoutState: { minimized: false, pinned: false, focused: true },
+      payload: {
+        game,
+        highlights,
+        view: 'highlights' // New view type
+      }
+    };
+    
+    store.addCard(card);
+    store.setFocusedCard(card.id);
+    return card;
   }
 };
 

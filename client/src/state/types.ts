@@ -69,6 +69,12 @@ export interface Highlight {
   teams?: { home: string; away: string };
   value?: string;
   createdAt: string;
+  cmfk?: CMFKVector;
+  momentum?: {
+    delta: number;
+    isShift: boolean;
+    direction: 'up' | 'down' | 'stable';
+  };
 }
 
 export interface ParcOSState {

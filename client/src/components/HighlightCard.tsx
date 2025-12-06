@@ -43,7 +43,7 @@ export const HighlightCard: React.FC<HighlightCardProps> = ({ highlight, isNew =
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.8 }}
       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-      className={`relative w-full h-24 px-3 py-2 rounded-lg backdrop-blur-md overflow-hidden border border-white/20 transition-all ${
+      className={`relative w-full p-3 rounded-xl backdrop-blur-md overflow-hidden border border-white/20 transition-all ${
         showPulse ? 'border-white/60 shadow-lg shadow-white/20' : 'shadow-sm'
       }`}
       style={{
@@ -55,7 +55,7 @@ export const HighlightCard: React.FC<HighlightCardProps> = ({ highlight, isNew =
       {/* Pulsing border for new highlights */}
       {showPulse && (
         <motion.div
-          className="absolute inset-0 rounded-lg border border-white/60 pointer-events-none"
+          className="absolute inset-0 rounded-xl border border-white/60 pointer-events-none"
           animate={{ opacity: [1, 0.3, 1] }}
           transition={{ duration: 1.5, repeat: Infinity }}
         />
@@ -63,11 +63,11 @@ export const HighlightCard: React.FC<HighlightCardProps> = ({ highlight, isNew =
 
       {/* Gradient background */}
       <div
-        className={`absolute inset-0 bg-gradient-to-br ${typeColors[highlight.type]} rounded-lg -z-10`}
+        className={`absolute inset-0 bg-gradient-to-br ${typeColors[highlight.type]} rounded-xl -z-10`}
       />
 
       {/* Content */}
-      <div className="relative flex h-full flex-col justify-between text-white">
+      <div className="relative flex flex-col justify-between text-white gap-2">
         {/* Header with emoji and type */}
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2">
@@ -84,17 +84,31 @@ export const HighlightCard: React.FC<HighlightCardProps> = ({ highlight, isNew =
         </div>
 
         {/* Summary text */}
-        <div className="flex flex-col">
-          <p className="text-xs font-medium line-clamp-2 text-white/90">
+        <div className="flex flex-col gap-1">
+          <p className="text-sm font-medium leading-snug text-white/90">
             {highlight.summary}
           </p>
-          <p className="text-[10px] text-white/50 mt-1">
-            {new Date(highlight.createdAt).toLocaleTimeString([], {
-              hour: '2-digit',
-              minute: '2-digit',
-              second: '2-digit'
-            })}
-          </p>
+          <div className="flex justify-between items-center mt-2">
+            <p className="text-[10px] text-white/50">
+              {new Date(highlight.createdAt).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+              })}
+            </p>
+            
+            {/* CMFK & Momentum Stats */}
+            {(highlight.momentum || highlight.cmfk) && (
+              <div className="flex items-center gap-3 text-[10px] text-indigo-200 bg-indigo-500/10 px-2 py-1 rounded-md border border-indigo-500/20">
+                {highlight.momentum && (
+                  <span>Mom: {highlight.momentum.delta}%</span>
+                )}
+                {highlight.cmfk && (
+                  <span>CMFK: {((highlight.cmfk.correctness + highlight.cmfk.knowingness + highlight.cmfk.fog + highlight.cmfk.misconception)/4).toFixed(2)}</span>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </motion.div>

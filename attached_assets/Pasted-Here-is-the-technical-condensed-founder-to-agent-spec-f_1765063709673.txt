@@ -1,0 +1,193 @@
+Here is the technical, condensed, founder-to-agent spec for Replit.
+This is exactly what your app does, is, and must do next — no fluff, just architecture-level truth.
+
+Paste this directly into Replit as your system prompt / task brief.
+
+⸻
+
+🚀 parcOS — Technical DPS (Defining Product Specification)
+
+Condensed, engineering-grade description of system behavior + required functionality
+
+⸻
+
+1. OS-Level Architecture
+
+parcOS is a web-native operating system layer composed of:
+	•	Canvas Engine → Absolute-positioned, draggable glass cards
+	•	Zustand Store → Global state for cards, stacks, workspaces, BILL commands
+	•	OOP Card Model → Each module (Sports, NIL, Creator, etc.) spawns sets of cards
+	•	VisionOS-like UI Layer → Glassmorphism, z-index hierarchy, responsive scaling
+	•	Dock → App-launcher for workspace spawning
+	•	SystemBar → Displays active workspace, global BILL actions
+
+Everything is modular, stack-driven, and deterministic.
+
+⸻
+
+2. Core Systems
+
+2.1 Card Engine
+
+Each card has:
+
+id, type, stackId, position(x,y,z), size, minimized, data
+
+Behaviors:
+	•	drag → continuous position updates
+	•	click → focus (max z-index, scale 1.04, glow shadow)
+	•	minimize → moves to dock
+	•	restore → exact previous position
+	•	visibility → filtered by activeStack
+
+2.2 Workspace Engine
+
+Workspaces = isolated environments (NIL, SPORTS, CREATOR, etc.)
+
+Functions required:
+
+setActiveWorkspace(name, stackId)
+spawnDefaultCardsForWorkspace()
+getVisibleCards()
+
+Switching workspaces hides all unrelated stacks.
+
+⸻
+
+3. Data Services
+
+3.1 ESPN Data Layer
+
+Service must fetch and parse:
+	•	Live event feed
+	•	Game metadata
+	•	Scoring plays
+	•	Team info
+	•	Status (LIVE / FINAL / SCHEDULED)
+
+Game events normalized into GameEvent objects:
+
+id, text, team, clock, quarter, score, raw
+
+Fallback → mock data simulator.
+
+⸻
+
+4. BILL AI Engine
+
+BILL exposes deterministic commands to mutate OS state.
+
+Required commands:
+
+analyzeGame()
+createMomentumCard()
+createPredictionCard()
+generateNarrativeCard()
+createHighlightCard()    // next module
+rearrangeWorkspace()
+getWorkspaceInsights()
+
+BILL never directly touches UI — only state.
+
+⸻
+
+5. Sports Workspace (current scope)
+
+When SPORTS icon is clicked:
+	1.	setActiveWorkspace('SPORTS', 'sports')
+	2.	If stack doesn’t exist → create stack
+	3.	Spawn 3 cards:
+
+SportsMultiView
+SportsOdds
+SportsStats
+
+	4.	Each card appears at defined coordinates:
+
+{x:120, y:120, z:5}, size: {360x520}
+
+5.1 SportsMultiView
+
+Must provide:
+	•	LIVE/SCHEDULED/FINAL game board
+	•	Auto-refresh every 30s
+	•	Red pulse indicator for live games
+	•	Action buttons (Analyze, Momentum, Predict, Narrative)
+	•	Integration with Cinema/Watch mode
+
+5.2 Cinema Mode
+
+Component receives:
+
+gameId, events[], teamInfo, highlights[]
+
+Displays:
+	•	Central primary card (80% width desktop / 95% mobile)
+	•	Filmstrip of thumbnails below
+	•	BILL sidecar insights
+
+⸻
+
+6. Highlight Engine (next required module)
+
+Service must:
+	1.	Parse GameEvent[]
+	2.	Score each event using:
+	•	CMFK vector scoring
+	•	Momentum-shift detection
+	3.	Select key moments
+	4.	Output HighlightMoment[]:
+
+id, timestamp, description, team, cmfkScore, momentumDelta
+
+	5.	Render HighlightCard with:
+
+	•	timeline
+	•	event list
+	•	momentum metrics
+	•	BILL auto-narration ready
+
+This becomes the foundation for the full Sports Bar / Multi-Stream Watch Mode.
+
+⸻
+
+7. Rendering Constraints
+	•	No clipping (overflow-visible everywhere)
+	•	Canvas must be fixed below SystemBar
+	•	Z-index hierarchy:
+
+SystemBar: z-50  
+Dock: z-50  
+BillOverlay: z-50  
+Cards: z>=5  
+Canvas: z-10  
+Background: z-[ -1 ]
+
+
+⸻
+
+8. Required Guarantees
+
+The system must:
+	1.	Spawn cards deterministically
+	2.	Never clip or hide cards accidentally
+	3.	Maintain workspace isolation
+	4.	Support unlimited cards per workspace
+	5.	Allow drag, minimize, restore, focus
+	6.	Render cleanly on mobile using same logic
+	7.	Run all BILL commands without race conditions
+
+⸻
+
+9. Deliverables Replit Should Generate Next
+	1.	highlight-engine.ts (complete service)
+	2.	HighlightCard.tsx (UI renderer)
+	3.	BILL command: createHighlightCard()
+	4.	Integrate highlight button into SportsMultiView
+	5.	Ensure Cinema Mode accepts highlights[]
+
+⸻
+
+If you drop this into Replit, the agent will know exactly what to extend and how the OS is architected.
+
+If you want a more compressed version, or a Replit-optimized agent briefing, or a Figma-Make UI spec, say “compress”, “replit brief,” or “figma spec.”
