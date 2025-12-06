@@ -1,6 +1,6 @@
 import React from 'react';
-import { ParcCardView } from './ParcCardView';
-import { useParcOSStore } from '../state/store';
+import { ParcCardView } from '@/components/ParcCardView';
+import { useParcOSStore } from '@/state/store';
 
 export const Canvas: React.FC = () => {
   const cards = useParcOSStore(state => state.cards);
