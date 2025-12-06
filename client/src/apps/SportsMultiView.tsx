@@ -7,6 +7,57 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SportsStack } from '@/components/SportsStack';
 import { HighlightCard } from '@/components/HighlightCard';
 import { Highlight } from '@/state/types';
+import { fetchAllSports, GameCard } from '@/services/sports-data';
+
+const OddsView: React.FC = () => {
+  const [games, setGames] = useState<GameCard[]>([]);
+
+  useEffect(() => {
+    fetchAllSports().then(setGames);
+  }, []);
+
+  return (
+    <div className="h-full flex flex-col text-white p-4 overflow-y-auto">
+      <div className="flex items-center gap-2 mb-4">
+        <TrendingUp className="w-5 h-5 text-green-400" />
+        <h2 className="text-sm font-bold uppercase tracking-wider">Live Odds & Spreads</h2>
+      </div>
+      
+      <div className="space-y-3">
+        {games.map(game => (
+          <div key={game.id} className="p-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-xs font-bold text-white/60">{game.league}</span>
+              <span className={`text-[10px] uppercase font-mono px-1.5 py-0.5 rounded ${game.status === 'live' ? 'bg-red-500/20 text-red-300' : 'bg-blue-500/20 text-blue-300'}`}>
+                {game.status === 'live' ? 'LIVE' : game.status}
+              </span>
+            </div>
+            
+            <div className="flex justify-between items-center mb-3">
+              <div className="text-sm font-semibold">{game.awayTeam.team}</div>
+              <div className="text-xs font-mono text-white/50">{game.odds?.moneyline?.away || '-'}</div>
+            </div>
+            <div className="flex justify-between items-center mb-3">
+              <div className="text-sm font-semibold">{game.homeTeam.team}</div>
+              <div className="text-xs font-mono text-white/50">{game.odds?.moneyline?.home || '-'}</div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-white/5">
+              <div className="bg-black/20 rounded p-1.5 text-center">
+                <div className="text-[9px] text-white/40 uppercase">Spread</div>
+                <div className="text-xs font-mono font-bold text-white/90">{game.odds?.spread || 'OFF'}</div>
+              </div>
+              <div className="bg-black/20 rounded p-1.5 text-center">
+                <div className="text-[9px] text-white/40 uppercase">Total</div>
+                <div className="text-xs font-mono font-bold text-white/90">{game.odds?.overUnder || 'OFF'}</div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 export const BillActionsRow: React.FC<{ cardId: string; gameData?: any }> = ({ cardId, gameData }) => {
   const setSideCardId = useParcOSStore(s => s.setSideCardId);
@@ -135,9 +186,16 @@ export const SportsMultiView: React.FC<{ payload: any }> = ({ payload }) => {
     );
   }
 
+  if (payload.view === 'odds') {
+    return <OddsView />;
+  }
+
+  // Default default tab based on view payload if not specific view component
+  const defaultTab = payload.view === 'stats' ? 'stats' : 'scoreboard';
+
   return (
     <div className="h-full flex flex-col text-white">
-      <Tabs defaultValue="scoreboard" className="flex-1 flex flex-col">
+      <Tabs defaultValue={defaultTab} className="flex-1 flex flex-col">
         <TabsList className="grid w-full grid-cols-3 bg-white/5 border-b border-white/10 rounded-none">
           <TabsTrigger value="scoreboard" className="flex items-center gap-2">
             <Activity className="w-4 h-4" />

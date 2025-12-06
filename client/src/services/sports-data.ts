@@ -27,6 +27,11 @@ export interface GameCard {
     winner: string;
     confidence: number;
   };
+  odds?: {
+    spread: string;
+    overUnder: string;
+    moneyline: { home: string; away: string };
+  };
   narrative?: string;
 }
 
@@ -42,7 +47,8 @@ const MOCK_GAMES: GameCard[] = [
     venue: 'Arrowhead Stadium',
     quarter: 4,
     momentum: { team: 'Kansas City Chiefs', direction: 'up', score: 14 },
-    prediction: { winner: 'Kansas City Chiefs', confidence: 0.72 }
+    prediction: { winner: 'Kansas City Chiefs', confidence: 0.72 },
+    odds: { spread: '-3.5', overUnder: '54.5', moneyline: { home: '-180', away: '+155' } }
   },
   {
     id: 'game-nba-001',
@@ -54,7 +60,8 @@ const MOCK_GAMES: GameCard[] = [
     venue: 'Crypto.com Arena',
     quarter: 4,
     momentum: { team: 'Los Angeles Lakers', direction: 'stable', score: 8 },
-    prediction: { winner: 'Los Angeles Lakers', confidence: 0.58 }
+    prediction: { winner: 'Los Angeles Lakers', confidence: 0.58 },
+    odds: { spread: '-4.5', overUnder: '225.5', moneyline: { home: '-190', away: '+165' } }
   },
   {
     id: 'game-ncaaf-001',
@@ -66,7 +73,8 @@ const MOCK_GAMES: GameCard[] = [
     venue: 'Ohio Stadium',
     quarter: 3,
     momentum: { team: 'Ohio State', direction: 'up', score: 21 },
-    prediction: { winner: 'Ohio State', confidence: 0.85 }
+    prediction: { winner: 'Ohio State', confidence: 0.85 },
+    odds: { spread: '-7.5', overUnder: '58.5', moneyline: { home: '-320', away: '+260' } }
   },
   {
     id: 'game-nfl-002',
@@ -75,7 +83,8 @@ const MOCK_GAMES: GameCard[] = [
     awayTeam: { team: 'Philadelphia Eagles', score: 0, logo: '🦅' },
     status: 'scheduled',
     time: '8:20 PM ET',
-    venue: 'AT&T Stadium'
+    venue: 'AT&T Stadium',
+    odds: { spread: '+2.5', overUnder: '49.5', moneyline: { home: '+115', away: '-135' } }
   },
   {
     id: 'game-nba-002',
@@ -84,7 +93,8 @@ const MOCK_GAMES: GameCard[] = [
     awayTeam: { team: 'Miami Heat', score: 0, logo: '🔥' },
     status: 'scheduled',
     time: '7:30 PM ET',
-    venue: 'TD Garden'
+    venue: 'TD Garden',
+    odds: { spread: '-6.5', overUnder: '218.5', moneyline: { home: '-260', away: '+215' } }
   }
 ];
 
