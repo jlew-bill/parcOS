@@ -24,6 +24,8 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
   isBillOpen: false,
   minimizedCards: [],
   lastCardPositions: {},
+  highlights: [],
+  highlightTimelineScroll: 0,
 
   addCard: (card) => set((state) => ({
     cards: { ...state.cards, [card.id]: card }
@@ -210,7 +212,17 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
     
     // Otherwise show all non-minimized cards
     return allCards.filter(card => !card.layoutState.minimized);
-  }
+  },
+
+  addHighlight: (highlight) => set((state) => ({
+    highlights: [...state.highlights, highlight]
+  })),
+
+  getHighlightsByGame: (gameId) => {
+    return get().highlights.filter(h => h.gameId === gameId);
+  },
+
+  setHighlightTimelineScroll: (scroll) => set({ highlightTimelineScroll: scroll })
 }));
 
 // Helper to initialize some default state

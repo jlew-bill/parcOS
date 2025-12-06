@@ -58,6 +58,19 @@ export interface ParcMessage {
   timestamp: string;
 }
 
+export type HighlightType = 'score_change' | 'lead_change' | 'run' | 'momentum_reversal' | 'injury' | 'turnover' | 'big_play';
+
+export interface Highlight {
+  id: string;
+  gameId: string;
+  timestamp: string;
+  type: HighlightType;
+  summary: string;
+  teams?: { home: string; away: string };
+  value?: string;
+  createdAt: string;
+}
+
 export interface ParcOSState {
   userCMFK: CMFKVector;
   cards: Record<string, ParcCard>;
@@ -73,6 +86,8 @@ export interface ParcOSState {
   isBillOpen: boolean;
   minimizedCards: string[];              // IDs of minimized cards
   lastCardPositions: Record<string, { x: number; y: number }>; // For restore
+  highlights: Highlight[];
+  highlightTimelineScroll: number;
   
   // Actions
   addCard: (card: ParcCard) => void;
@@ -91,4 +106,7 @@ export interface ParcOSState {
   exitSportsCinema: () => void;
   setSideCardId: (cardId: string | null) => void;
   getVisibleCards: () => ParcCard[];
+  addHighlight: (highlight: Highlight) => void;
+  getHighlightsByGame: (gameId: string) => Highlight[];
+  setHighlightTimelineScroll: (scroll: number) => void;
 }
