@@ -13,7 +13,7 @@ function App() {
   }, []);
 
   return (
-    <div className="w-full h-screen bg-[#0a0a0c] text-white overflow-hidden font-sans selection:bg-indigo-500/30">
+    <div className="w-full h-screen bg-[#0a0a0c] text-white overflow-visible font-sans selection:bg-indigo-500/30">
       <SystemBar />
       <Canvas />
       <Dock />
