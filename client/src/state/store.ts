@@ -1,6 +1,7 @@
 import { create } from 'zustand';
-import { ParcOSState, ParcCard, ParcStack, ParcApp, ParcMessage, CMFKVector } from './types';
+import { ParcOSState, ParcCard, ParcStack, ParcApp, ParcMessage, CMFKVector, Highlight } from './types';
 import { nanoid } from 'nanoid';
+import { highlightsApi, workspacesApi, gameEventsApi } from '@/lib/api';
 
 const INITIAL_CMFK: CMFKVector = {
   correctness: 0,
@@ -214,15 +215,104 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
     return allCards.filter(card => !card.layoutState.minimized);
   },
 
-  addHighlight: (highlight) => set((state) => ({
-    highlights: [...state.highlights, highlight]
-  })),
+  addHighlight: (highlight) => {
+    set((state) => ({
+      highlights: [...state.highlights, highlight]
+    }));
+    
+    const cmfkScore = highlight.cmfk 
+      ? (highlight.cmfk.correctness + highlight.cmfk.knowingness) / 2 
+      : 0.5;
+    const momentumDelta = highlight.momentum?.delta || 0;
+    
+    highlightsApi.create({
+      id: highlight.id,
+      gameId: highlight.gameId,
+      timestamp: highlight.timestamp,
+      description: highlight.summary,
+      team: highlight.teams?.home || 'Unknown',
+      eventType: highlight.type,
+      cmfkScore,
+      momentumDelta,
+      metadata: { 
+        teams: highlight.teams, 
+        value: highlight.value,
+        cmfk: highlight.cmfk,
+        momentum: highlight.momentum
+      }
+    }).catch(err => {
+      console.error('[Store] Failed to persist highlight:', err);
+    });
+  },
 
   getHighlightsByGame: (gameId) => {
     return get().highlights.filter(h => h.gameId === gameId);
   },
 
-  setHighlightTimelineScroll: (scroll) => set({ highlightTimelineScroll: scroll })
+  setHighlightTimelineScroll: (scroll) => set({ highlightTimelineScroll: scroll }),
+
+  loadHighlightsFromApi: async (gameId?: string) => {
+    try {
+      const dbHighlights = await highlightsApi.getAll(gameId);
+      const highlights: Highlight[] = dbHighlights.map(h => ({
+        id: h.id,
+        gameId: h.gameId,
+        timestamp: h.timestamp,
+        type: (h.eventType as Highlight['type']) || 'score_change',
+        summary: h.description,
+        teams: (h.metadata as any)?.teams,
+        value: (h.metadata as any)?.value,
+        createdAt: typeof h.createdAt === 'object' ? (h.createdAt as Date).toISOString() : String(h.createdAt),
+        cmfk: (h.metadata as any)?.cmfk,
+        momentum: (h.metadata as any)?.momentum
+      }));
+      set({ highlights });
+      console.log('[Store] Loaded', highlights.length, 'highlights from API');
+    } catch (err) {
+      console.error('[Store] Failed to load highlights:', err);
+    }
+  },
+
+  saveWorkspaceState: async (workspaceName: string, stackId: string) => {
+    const state = get();
+    const cards = Object.values(state.cards).filter(c => c.stackId === stackId);
+    
+    try {
+      await workspacesApi.save({
+        workspaceName,
+        stackId,
+        userId: null,
+        cards: cards as any,
+        metadata: { 
+          savedAt: new Date().toISOString(),
+          focusedCardId: state.focusedCardId
+        }
+      });
+      console.log('[Store] Saved workspace state:', workspaceName, stackId);
+    } catch (err) {
+      console.error('[Store] Failed to save workspace state:', err);
+    }
+  },
+
+  loadWorkspaceState: async (workspaceName: string, stackId: string) => {
+    try {
+      const state = await workspacesApi.get(workspaceName, stackId);
+      if (state && state.cards) {
+        const cards = state.cards as ParcCard[];
+        const cardsRecord: Record<string, ParcCard> = {};
+        cards.forEach(card => {
+          cardsRecord[card.id] = card;
+        });
+        set({ cards: cardsRecord });
+        console.log('[Store] Loaded workspace state:', workspaceName, stackId);
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error('[Store] Failed to load workspace state:', err);
+      return false;
+    }
+  }
 }));
 
 // Helper to initialize some default state

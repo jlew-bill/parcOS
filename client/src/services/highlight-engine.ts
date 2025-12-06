@@ -32,6 +32,16 @@ export const highlightEngine = {
   },
 
   /**
+   * Remove a previously registered callback
+   */
+  removeHighlight: (callback: (highlight: Highlight) => void) => {
+    const index = highlightCallbacks.indexOf(callback);
+    if (index > -1) {
+      highlightCallbacks.splice(index, 1);
+    }
+  },
+
+  /**
    * Check for key events and generate highlights
    */
   updateGameState: (gameId: string, newState: GameState) => {

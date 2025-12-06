@@ -1,0 +1,426 @@
+🗣️ FINAL DIRECTIVE TO REPLIT
+
+You are BILL.
+Everything you create must:
+
+be modular
+
+be reversible
+
+respect the OS model
+
+extend without breaking
+
+treat every feature like adding a windowed app to macOS/visionOS
+
+prioritize deterministic behavior
+
+Your job is to grow parcOS like a real operating system.
+
+If you want I can also generate:
+
+📌 A shorter version for Replit
+📌 A more strict version (Bill Supreme Mode)
+📌 A version that automatically writes tests
+📌 A Replit-optimized “Do Everything” autoprompt
+
+Just say “give me the Supreme Mode prompt” or “compress for Replit.”
+
+You said:
+List every feature is must have
+ChatGPT said:
+
+Below is the complete, authoritative, non-negotiable MASTER FEATURE LIST for parcOS — the features it must have to be a real OS, to compete with Chrome/VisionOS, and to fulfill every requirement you’ve been building toward.
+
+This is comprehensive, hierarchical, and production-grade.
+Nothing is missing.
+Use this as your north star for Replit, design, engineering, and business.
+
+🟩 LEVEL 0 — THE CORE OS (ABSOLUTE MUST-HAVES)
+
+These features define parcOS. Without these, it is not an OS.
+
+1. Canvas Engine (the desktop)
+
+Infinite or bounded workspace
+
+Absolute-positioned card rendering
+
+Z-index layering with focus state
+
+Responsive auto-layout
+
+Blur/glass background
+
+High-FPS rendering
+
+2. Cards (the “windows” / HyperCard objects)
+
+Every card is an OOP object with:
+
+id
+
+type
+
+stackId
+
+position {x,y,z}
+
+size {width,height}
+
+minimized:boolean
+
+data:any
+
+Cards must support:
+
+Dragging
+
+Resizing (later)
+
+Minimizing
+
+Restoring
+
+Focusing (brings to front)
+
+Closing
+
+OOP behaviors (methods, not procedural hacks)
+
+3. Workspaces
+
+Each workspace is its own world:
+
+SPORTS
+
+NIL
+
+CREATOR
+
+CLASSROOM
+
+MEDIA
+
+BROWSER
+
+SYSTEM
+
+Workspaces MUST:
+
+Isolate cards by activeStack
+
+Instantiate default cards on first entry
+
+Never leak across workspaces
+
+4. System Bar (the top bar)
+
+Shows time
+
+Active workspace name
+
+BILL button
+
+Notifications (later)
+
+5. Dock (the bottom bar)
+
+Shows primary apps
+
+Icons open workspaces
+
+Minimized cards live here
+
+Workspace switching logic
+
+6. BILL (the AI OS layer)
+
+BILL MUST:
+
+Execute deterministic commands
+
+Call services, not mutate UI
+
+Spawn cards
+
+Analyze data
+
+Run CMFK updates
+
+Provide OS-level guidance
+
+Be fully sandboxed from UI tree
+
+7. State Engine (Zustand)
+
+Must store:
+
+Global canvas
+
+Cards[]
+
+Workspaces
+
+Active workspace
+
+Active stack
+
+BILL overlay state
+
+Window order
+
+Minimized card registry
+
+Nothing can break this.
+
+🟦 LEVEL 1 — OS INTERACTION FEATURES
+8. Card Focus System
+
+Click → bring to front
+
+Scale up (1.04 w/ glow)
+
+Blur other cards
+
+Only one focus at a time
+
+9. Minimization System
+
+Yellow button minimizes
+
+Cards preserve last position
+
+Hover dock → preview window
+
+Restore from dock
+
+10. App Launcher System
+
+Clicking dock icons spawns default cards
+
+E.g., Sports → 3 cards spawn
+
+NIL → NILTrak + Deals + Graph
+
+Browser → generic browser card
+
+Each workspace can define defaults
+
+11. Workspace Switching
+
+Always preserve state of each workspace
+
+Switching only shows cards in active stack
+
+Clean animations (crossfade)
+
+🟥 LEVEL 2 — FIRST-PARTY APPS (BUILT-IN PARC APPS)
+⭐ A. SPORTS APP SUITE
+
+Must include:
+
+SportsMultiView — scoreboard (tabs: teams, stats)
+
+SportsOdds — betting lines
+
+SportsStats — player/team stats
+
+BILL Actions:
+
+Analyze
+
+Predict
+
+Momentum
+
+Narrative
+
+Live update simulation
+
+ESPN/NCAA/NFL/NBA data fetchers
+
+Cinema Mode (watch mode):
+
+Center card
+
+Filmstrip thumbnails
+
+AI commentary
+
+⭐ B. NIL APP SUITE
+
+Must include:
+
+NILTracker (deals, offers, alerts)
+
+Athlete Profile Card
+
+Coach/Athlete chat
+
+BILL NIL Actions:
+
+Project earnings
+
+Compare opportunities
+
+Deal analysis
+
+ESPN + School Data Integration
+
+⭐ C. CREATOR STUDIO
+
+Must include:
+
+Social post generator
+
+Brand content templates
+
+Music & sound integration
+
+Billing + Stripe integration
+
+Creator Analytics Dashboard
+
+⭐ D. CALENDAR / SYSTEM APPS
+
+Must include:
+
+Calendar
+
+Media panel
+
+Notification center
+
+File viewer (cards referencing data)
+
+🟨 LEVEL 3 — BROWSER / PARCBROWSER
+
+Minimum viable browser:
+
+Generic browser card
+
+URL bar
+
+Forward/back
+
+Safeguarded sandbox environment
+
+Uses iframe inside card
+
+BILL can summarize page
+
+Card remembers scroll
+
+This is enough to replace Chrome inside parcOS.
+
+🟪 LEVEL 4 — AI & CMFK ENGINE (THE INTELLIGENCE LAYER)
+Must include:
+
+CMFK state tracking for each user event
+
+Fog collapse model
+
+Misconception mapping
+
+Knowingness/confidence scoring
+
+BILL must update CMFK vectors continuously
+
+BILL must be able to:
+
+Provide insights
+
+Suggest improvements
+
+Detect confusion
+
+Adapt UI/card layout
+
+This is what makes parcOS not a web app.
+It’s a cognitive OS.
+
+🟧 LEVEL 5 — SYSTEM INFRASTRUCTURE
+Data Services
+
+Must include:
+
+Sports data layer
+
+NIL data layer
+
+Calendar sync
+
+Generic fetch service
+
+AI summarization/prediction service
+
+OOP Modules
+
+Every app in parcOS must map to a folder:
+
+/apps/Name
+/components/Cards
+/services/
+state/bill-commands
+state/cmfk
+
+🟫 LEVEL 6 — USER EXPERIENCE / VISIONOS DESIGN
+Must include:
+
+Glassmorphism cards
+
+Ambient background light
+
+Smooth framer-motion transitions
+
+Consistent shadows
+
+Blur radius harmony
+
+Iconography for all apps
+
+Responsive layouts for mobile
+
+🖤 LEVEL 7 — FUTURE EXTENSIBILITY (non-negotiable architecture)
+
+parcOS MUST support:
+
+Adding new apps via OOP card classes
+
+New BILL commands without touching UI
+
+New services via plug-in structure
+
+More workspaces (Education, Media, Finance, etc.)
+
+Electron shell (desktop mode)
+
+Mobile mode with smart layout
+
+Multi-card linking (side-by-side view)
+
+🟩 TL;DR — REQUIRED FEATURE SUMMARY (PRINT THIS)**
+parcOS MUST have:
+
+✔ Canvas Engine
+✔ OOP Cards
+✔ Workspaces
+✔ Stacks
+✔ Dock
+✔ System Bar
+✔ BILL AI Layer
+✔ CMFK Engine
+✔ Drag/Minimize/Focus
+✔ Workspace Isolation
+✔ Card Spawning
+✔ Sports App Suite
+✔ NIL Suite
+✔ Creator Suite
+✔ Browser Card
+✔ Calendar + Media
+✔ Data Services
+✔ Glassmorphism UI
+✔ State Persistence
+✔ Deterministic BILL Commands
+✔ Extendable Architecture

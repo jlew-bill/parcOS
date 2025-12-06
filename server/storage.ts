@@ -56,7 +56,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createHighlight(highlight: InsertHighlight): Promise<Highlight> {
-    const [created] = await db.insert(highlights).values(highlight).returning();
+    const [created] = await db.insert(highlights)
+      .values(highlight)
+      .onConflictDoNothing({ target: highlights.id })
+      .returning();
+    
+    if (!created) {
+      const [existing] = await db.select().from(highlights).where(eq(highlights.id, highlight.id)).limit(1);
+      return existing;
+    }
     return created;
   }
 

@@ -115,4 +115,7 @@ export interface ParcOSState {
   addHighlight: (highlight: Highlight) => void;
   getHighlightsByGame: (gameId: string) => Highlight[];
   setHighlightTimelineScroll: (scroll: number) => void;
+  loadHighlightsFromApi: (gameId?: string) => Promise<void>;
+  saveWorkspaceState: (workspaceName: string, stackId: string) => Promise<void>;
+  loadWorkspaceState: (workspaceName: string, stackId: string) => Promise<boolean>;
 }

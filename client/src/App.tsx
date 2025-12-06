@@ -3,16 +3,43 @@ import { SystemBar } from '@/components/SystemBar';
 import { Dock } from '@/components/Dock';
 import { Canvas } from '@/components/Canvas';
 import { BillOverlay } from '@/components/BillOverlay';
-import { initializeState } from '@/state/store';
+import { initializeState, useParcOSStore } from '@/state/store';
 import { Toaster } from "@/components/ui/toaster";
 import { highlightEngine } from '@/services/highlight-engine';
 
 function App() {
   useEffect(() => {
-    // Initialize mock data on load
     initializeState();
 
-    // Start demo highlights for showcase
+    const store = useParcOSStore.getState();
+    store.loadHighlightsFromApi();
+
+    const handleHighlight = (highlight: any) => {
+      store.addHighlight(highlight);
+    };
+    
+    highlightEngine.onHighlight(handleHighlight);
+
+    setTimeout(() => {
+      highlightEngine.updateGameState('game-nfl-001', {
+        gameId: 'game-nfl-001',
+        homeTeam: 'Kansas City Chiefs',
+        awayTeam: 'Buffalo Bills',
+        homeScore: 24,
+        awayScore: 21,
+        momentum: { team: 'Kansas City Chiefs', direction: 'stable' }
+      });
+      
+      highlightEngine.updateGameState('game-nba-001', {
+        gameId: 'game-nba-001',
+        homeTeam: 'Los Angeles Lakers',
+        awayTeam: 'Golden State Warriors',
+        homeScore: 102,
+        awayScore: 99,
+        momentum: { team: 'Los Angeles Lakers', direction: 'stable' }
+      });
+    }, 1000);
+
     setTimeout(() => {
       highlightEngine.updateGameState('game-nfl-001', {
         gameId: 'game-nfl-001',
@@ -20,8 +47,6 @@ function App() {
         awayTeam: 'Buffalo Bills',
         homeScore: 31,
         awayScore: 21,
-        previousHomeScore: 24,
-        previousAwayScore: 21,
         momentum: { team: 'Kansas City Chiefs', direction: 'up' }
       });
       
@@ -31,11 +56,13 @@ function App() {
         awayTeam: 'Golden State Warriors',
         homeScore: 115,
         awayScore: 99,
-        previousHomeScore: 102,
-        previousAwayScore: 99,
         momentum: { team: 'Los Angeles Lakers', direction: 'up' }
       });
-    }, 2000);
+    }, 3000);
+
+    return () => {
+      highlightEngine.removeHighlight(handleHighlight);
+    };
   }, []);
 
   return (
