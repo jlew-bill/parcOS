@@ -17,9 +17,10 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
   messages: [],
   focusedCardId: null,
   workspaceName: "Creator Studio",
+  activeWorkspace: null,
+  activeStack: null,
   isBillOpen: false,
   minimizedCards: [],
-  filterStackId: null,
   lastCardPositions: {},
 
   addCard: (card) => set((state) => ({
@@ -41,7 +42,6 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
   }),
 
   setFocusedCard: (id) => set((state) => {
-    // Bring to front logic: set z-index to max + 1
     const maxZ = Math.max(...Object.values(state.cards).map(c => c.position.z), 0);
     const card = state.cards[id];
     
@@ -130,16 +130,70 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
     };
   }),
 
-  setStackFilter: (stackId) => set({ filterStackId: stackId }),
+  setActiveWorkspace: (workspace, stack) => set({ 
+    activeWorkspace: workspace, 
+    activeStack: stack 
+  }),
+
+  spawnSportsDefaultCards: (stackId) => {
+    const store = get();
+    
+    const defaultCards = [
+      {
+        title: 'Sports MultiView',
+        appId: 'sports-multiview',
+        payload: {}
+      },
+      {
+        title: 'Sports Odds',
+        appId: 'sports-multiview',
+        payload: { view: 'odds' }
+      },
+      {
+        title: 'Sports Stats',
+        appId: 'sports-multiview',
+        payload: { view: 'stats' }
+      }
+    ];
+
+    defaultCards.forEach((card, idx) => {
+      const newCard: ParcCard = {
+        id: nanoid(),
+        type: 'card',
+        title: card.title,
+        appId: card.appId,
+        stackId,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        cmfk: INITIAL_CMFK,
+        metadata: { workspace: 'SPORTS' },
+        position: { 
+          x: 120 + (idx * 100), 
+          y: 120, 
+          z: 5 + idx 
+        },
+        size: { width: 360, height: 520 },
+        layoutState: { minimized: false, pinned: false, focused: idx === 0 },
+        payload: card.payload
+      };
+
+      store.addCard(newCard);
+      if (idx === 0) store.setFocusedCard(newCard.id);
+    });
+
+    console.log('[Workspace] Spawned 3 Sports cards for stack:', stackId);
+  },
 
   getVisibleCards: () => {
     const state = get();
     const allCards = Object.values(state.cards);
     
-    if (state.filterStackId) {
-      return allCards.filter(card => card.stackId === state.filterStackId && !card.layoutState.minimized);
+    // Filter by active stack if one is set
+    if (state.activeStack) {
+      return allCards.filter(card => card.stackId === state.activeStack && !card.layoutState.minimized);
     }
     
+    // Otherwise show all non-minimized cards
     return allCards.filter(card => !card.layoutState.minimized);
   }
 }));
@@ -215,7 +269,20 @@ export const initializeState = () => {
     metadata: {}
   };
 
+  const sportsStack: ParcStack = {
+    id: nanoid(),
+    type: 'stack',
+    title: 'Sports Stack',
+    domain: 'sports',
+    cardIds: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    cmfk: INITIAL_CMFK,
+    metadata: {}
+  };
+
   store.createStack(nilStack);
+  store.createStack(sportsStack);
 
   // Create initial cards
   const card1: ParcCard = {
@@ -239,6 +306,7 @@ export const initializeState = () => {
     type: 'card',
     title: 'Live Game Stats',
     appId: 'sports-multiview',
+    stackId: sportsStack.id,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     cmfk: INITIAL_CMFK,

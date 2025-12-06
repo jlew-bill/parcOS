@@ -10,41 +10,99 @@ export const Dock: React.FC = () => {
   const minimizedCards = useParcOSStore(state => state.minimizedCards);
   const restoreCard = useParcOSStore(state => state.restoreCard);
   const cards = useParcOSStore(state => state.cards);
+  const setActiveWorkspace = useParcOSStore(state => state.setActiveWorkspace);
+  const spawnSportsDefaultCards = useParcOSStore(state => state.spawnSportsDefaultCards);
   
   const [expandMinimized, setExpandMinimized] = useState(false);
 
   const dockItems = [
-    { id: 'sports', icon: Trophy, label: 'Sports', app: 'sports-multiview' },
-    { id: 'nil', icon: DollarSign, label: 'NIL', app: 'nil-dashboard' },
-    { id: 'class', icon: GraduationCap, label: 'Classroom', app: 'classroom-board' },
-    { id: 'browser', icon: Globe, label: 'Browser', app: 'generic-browser' },
-    { id: 'creator', icon: LayoutGrid, label: 'Creator', app: 'creator-studio' },
-    { id: 'system', icon: Settings, label: 'System', app: 'system-tools' },
+    { id: 'sports', icon: Trophy, label: 'Sports', app: 'sports-multiview', workspace: 'SPORTS', stack: 'sports' },
+    { id: 'nil', icon: DollarSign, label: 'NIL', app: 'nil-dashboard', workspace: 'NIL', stack: 'nil' },
+    { id: 'class', icon: GraduationCap, label: 'Classroom', app: 'classroom-board', workspace: 'CLASSROOM', stack: 'classroom' },
+    { id: 'browser', icon: Globe, label: 'Browser', app: 'generic-browser', workspace: null, stack: null },
+    { id: 'creator', icon: LayoutGrid, label: 'Creator', app: 'creator-studio', workspace: null, stack: null },
+    { id: 'system', icon: Settings, label: 'System', app: 'system-tools', workspace: null, stack: null },
   ];
 
   const handleLaunch = (item: typeof dockItems[0]) => {
-    const maxZ = Math.max(...Object.values(cards).map(c => c.position.z), 0);
+    const stacks = useParcOSStore.getState().stacks;
+    const allStacks = Object.values(stacks);
     
-    const newCard = {
-      id: nanoid(),
-      type: 'card' as const,
-      title: `${item.label} Stack`,
-      appId: item.app,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      cmfk: { correctness: 0, misconception: 0, fog: 0.5, knowingness: 0.1 },
-      metadata: {},
-      position: { 
-        x: window.innerWidth / 2 - 225 + (Math.random() * 80 - 40), 
-        y: window.innerHeight / 2 - 250 + (Math.random() * 80 - 40), 
-        z: maxZ + 1
-      },
-      size: { width: 450, height: 500 },
-      layoutState: { minimized: false, pinned: false, focused: true },
-      payload: item.app === 'nil-dashboard' ? { totalValue: 125000, deals: 4 } : {}
-    };
-    addCard(newCard);
-    setFocusedCard(newCard.id);
+    // Set active workspace
+    if (item.workspace && item.stack) {
+      setActiveWorkspace(item.workspace, item.stack);
+      
+      // Find or create stack
+      const existingStack = allStacks.find(s => s.domain === item.stack);
+      const stackId = existingStack?.id || nanoid();
+      
+      if (!existingStack) {
+        const newStack: typeof stacks[keyof typeof stacks] = {
+          id: stackId,
+          type: 'stack',
+          title: `${item.label} Stack`,
+          domain: item.stack,
+          cardIds: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          cmfk: { correctness: 0, misconception: 0, fog: 0.5, knowingness: 0.1 },
+          metadata: {}
+        };
+        useParcOSStore.getState().createStack(newStack);
+      }
+      
+      // Spawn default cards for sports workspace
+      if (item.workspace === 'SPORTS') {
+        spawnSportsDefaultCards(stackId);
+      } else {
+        // For other workspaces, spawn single card
+        const maxZ = Math.max(...Object.values(cards).map(c => c.position.z), 0);
+        const newCard = {
+          id: nanoid(),
+          type: 'card' as const,
+          title: `${item.label} Stack`,
+          appId: item.app,
+          stackId,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          cmfk: { correctness: 0, misconception: 0, fog: 0.5, knowingness: 0.1 },
+          metadata: { workspace: item.workspace },
+          position: { 
+            x: 120 + Math.random() * 40,
+            y: 120 + Math.random() * 40,
+            z: maxZ + 1
+          },
+          size: { width: 450, height: 500 },
+          layoutState: { minimized: false, pinned: false, focused: true },
+          payload: item.app === 'nil-dashboard' ? { totalValue: 125000, deals: 4 } : {}
+        };
+        addCard(newCard);
+        setFocusedCard(newCard.id);
+      }
+    } else {
+      // Non-workspace apps
+      const maxZ = Math.max(...Object.values(cards).map(c => c.position.z), 0);
+      const newCard = {
+        id: nanoid(),
+        type: 'card' as const,
+        title: `${item.label}`,
+        appId: item.app,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        cmfk: { correctness: 0, misconception: 0, fog: 0.5, knowingness: 0.1 },
+        metadata: {},
+        position: { 
+          x: 200 + Math.random() * 100, 
+          y: 200 + Math.random() * 100, 
+          z: maxZ + 1
+        },
+        size: { width: 450, height: 500 },
+        layoutState: { minimized: false, pinned: false, focused: true },
+        payload: {}
+      };
+      addCard(newCard);
+      setFocusedCard(newCard.id);
+    }
   };
 
   return (

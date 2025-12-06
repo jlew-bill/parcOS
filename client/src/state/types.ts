@@ -66,9 +66,10 @@ export interface ParcOSState {
   messages: ParcMessage[];
   focusedCardId: string | null;
   workspaceName: string;
+  activeWorkspace: string | null;        // e.g., 'SPORTS', 'NIL', 'CLASSROOM'
+  activeStack: string | null;            // e.g., 'sports', 'nil', 'classroom'
   isBillOpen: boolean;
   minimizedCards: string[];              // IDs of minimized cards
-  filterStackId: string | null;          // Active stack filter (null = show all)
   lastCardPositions: Record<string, { x: number; y: number }>; // For restore
   
   // Actions
@@ -82,6 +83,7 @@ export interface ParcOSState {
   setBillOpen: (isOpen: boolean) => void;
   minimizeCard: (id: string) => void;
   restoreCard: (id: string) => void;
-  setStackFilter: (stackId: string | null) => void;
+  setActiveWorkspace: (workspace: string | null, stack: string | null) => void;
+  spawnSportsDefaultCards: (stackId: string) => void;
   getVisibleCards: () => ParcCard[];
 }

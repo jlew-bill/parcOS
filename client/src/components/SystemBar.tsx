@@ -4,9 +4,12 @@ import { Bot, User, Bell, Search, Hexagon } from 'lucide-react';
 
 export const SystemBar: React.FC = () => {
   const workspaceName = useParcOSStore(state => state.workspaceName);
+  const activeWorkspace = useParcOSStore(state => state.activeWorkspace);
   const toggleBill = useParcOSStore(state => state.toggleBill);
   const isBillOpen = useParcOSStore(state => state.isBillOpen);
   const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  const displayName = activeWorkspace || workspaceName;
 
   return (
     <div className="fixed top-0 left-0 right-0 h-12 z-50 flex items-center justify-between px-6 glass-panel border-b border-white/10 rounded-none">
@@ -16,7 +19,7 @@ export const SystemBar: React.FC = () => {
       </div>
 
       <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
-        <span className="text-xs font-medium text-white/80 uppercase tracking-wider">{workspaceName}</span>
+        <span className="text-xs font-medium text-white/80 uppercase tracking-wider">{displayName}</span>
       </div>
 
       <div className="flex items-center gap-6">
