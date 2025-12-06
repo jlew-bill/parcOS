@@ -19,6 +19,8 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
   workspaceName: "Creator Studio",
   activeWorkspace: null,
   activeStack: null,
+  sportsMode: "default",
+  cinemaSideCardId: null,
   isBillOpen: false,
   minimizedCards: [],
   lastCardPositions: {},
@@ -183,6 +185,19 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
 
     console.log('[Workspace] Spawned 3 Sports cards for stack:', stackId);
   },
+
+  enterSportsCinema: (cardId) => set((state) => ({
+    sportsMode: "cinema",
+    focusedCardId: cardId,
+    cinemaSideCardId: null
+  })),
+
+  exitSportsCinema: () => set({
+    sportsMode: "default",
+    cinemaSideCardId: null
+  }),
+
+  setSideCardId: (cardId) => set({ cinemaSideCardId: cardId }),
 
   getVisibleCards: () => {
     const state = get();

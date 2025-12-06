@@ -68,6 +68,8 @@ export interface ParcOSState {
   workspaceName: string;
   activeWorkspace: string | null;        // e.g., 'SPORTS', 'NIL', 'CLASSROOM'
   activeStack: string | null;            // e.g., 'sports', 'nil', 'classroom'
+  sportsMode: "default" | "cinema";      // SPORTS workspace mode
+  cinemaSideCardId: string | null;       // Sidecard showing BILL analysis
   isBillOpen: boolean;
   minimizedCards: string[];              // IDs of minimized cards
   lastCardPositions: Record<string, { x: number; y: number }>; // For restore
@@ -85,5 +87,8 @@ export interface ParcOSState {
   restoreCard: (id: string) => void;
   setActiveWorkspace: (workspace: string | null, stack: string | null) => void;
   spawnSportsDefaultCards: (stackId: string) => void;
+  enterSportsCinema: (cardId: string) => void;
+  exitSportsCinema: () => void;
+  setSideCardId: (cardId: string | null) => void;
   getVisibleCards: () => ParcCard[];
 }

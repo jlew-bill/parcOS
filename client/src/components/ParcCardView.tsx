@@ -2,11 +2,13 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { ParcCard } from '@/state/types';
 import { useParcOSStore } from '@/state/store';
-import { Minimize2, GripHorizontal } from 'lucide-react';
-import { SportsMultiView } from '@/apps/SportsMultiView';
+import { Minimize2, GripHorizontal, Play, X } from 'lucide-react';
 import { NILDashboard } from '@/apps/NILDashboard';
 import { ClassroomBoard } from '@/apps/ClassroomBoard';
 import { GenericBrowserCard } from '@/apps/GenericBrowserCard';
+
+// Lazy import SportsMultiView to avoid circular dependencies
+const SportsMultiView = React.lazy(() => import('@/apps/SportsMultiView').then(m => ({ default: m.SportsMultiView })));
 
 const AppRegistry: Record<string, React.FC<{ payload: any }>> = {
   'sports-multiview': SportsMultiView,
@@ -21,7 +23,12 @@ export const ParcCardView: React.FC<{ card: ParcCard }> = ({ card }) => {
   const updateCardPosition = useParcOSStore(s => s.updateCardPosition);
   const setFocusedCard = useParcOSStore(s => s.setFocusedCard);
   const minimizeCard = useParcOSStore(s => s.minimizeCard);
+  const enterSportsCinema = useParcOSStore(s => s.enterSportsCinema);
+  const exitSportsCinema = useParcOSStore(s => s.exitSportsCinema);
+  const activeWorkspace = useParcOSStore(s => s.activeWorkspace);
+  const sportsMode = useParcOSStore(s => s.sportsMode);
   const isFocused = card.layoutState.focused;
+  const isCinemaMode = activeWorkspace === 'SPORTS' && sportsMode === 'cinema' && isFocused;
 
   const App = card.appId ? AppRegistry[card.appId] : null;
 
@@ -81,12 +88,34 @@ export const ParcCardView: React.FC<{ card: ParcCard }> = ({ card }) => {
         </div>
 
         <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button 
-              className="p-1.5 hover:bg-white/10 rounded-full text-white/60 hover:text-white transition-colors" 
-              data-testid={`button-grip-${card.id}`}
-            >
-                <GripHorizontal className="w-4 h-4" />
-            </button>
+            {activeWorkspace === 'SPORTS' && !isCinemaMode && (
+              <button 
+                className="p-1.5 hover:bg-indigo-500/20 rounded-full text-indigo-300 hover:text-indigo-100 transition-colors" 
+                data-testid={`button-watch-${card.id}`}
+                onClick={() => enterSportsCinema(card.id)}
+                title="Watch Mode"
+              >
+                  <Play className="w-4 h-4 fill-current" />
+              </button>
+            )}
+            {isCinemaMode && (
+              <button 
+                className="p-1.5 hover:bg-red-500/20 rounded-full text-red-300 hover:text-red-100 transition-colors" 
+                data-testid={`button-exit-cinema-${card.id}`}
+                onClick={() => exitSportsCinema()}
+                title="Exit Watch Mode"
+              >
+                  <X className="w-4 h-4" />
+              </button>
+            )}
+            {!isCinemaMode && (
+              <button 
+                className="p-1.5 hover:bg-white/10 rounded-full text-white/60 hover:text-white transition-colors" 
+                data-testid={`button-grip-${card.id}`}
+              >
+                  <GripHorizontal className="w-4 h-4" />
+              </button>
+            )}
         </div>
       </div>
 
