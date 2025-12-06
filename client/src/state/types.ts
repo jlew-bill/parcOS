@@ -39,7 +39,7 @@ export interface ParcStack extends ParcObject {
   domain: string;           // "sports" | "classroom" | "nil" | "system" | ...
 }
 
-// An app definition (OOP “class” for cards)
+// An app definition (OOP "class" for cards)
 export interface ParcApp extends ParcObject {
   type: "app";
   slug: string;             // "sports-multiview", "nil-dashboard", etc.
@@ -67,6 +67,9 @@ export interface ParcOSState {
   focusedCardId: string | null;
   workspaceName: string;
   isBillOpen: boolean;
+  minimizedCards: string[];              // IDs of minimized cards
+  filterStackId: string | null;          // Active stack filter (null = show all)
+  lastCardPositions: Record<string, { x: number; y: number }>; // For restore
   
   // Actions
   addCard: (card: ParcCard) => void;
@@ -77,4 +80,8 @@ export interface ParcOSState {
   registerApp: (app: ParcApp) => void;
   toggleBill: () => void;
   setBillOpen: (isOpen: boolean) => void;
+  minimizeCard: (id: string) => void;
+  restoreCard: (id: string) => void;
+  setStackFilter: (stackId: string | null) => void;
+  getVisibleCards: () => ParcCard[];
 }

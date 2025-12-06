@@ -3,11 +3,13 @@ import { ParcCardView } from '@/components/ParcCardView';
 import { useParcOSStore } from '@/state/store';
 
 export const Canvas: React.FC = () => {
-  const cards = useParcOSStore(state => state.cards);
+  const getVisibleCards = useParcOSStore(state => state.getVisibleCards);
+  
+  const visibleCards = getVisibleCards();
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-transparent">
-      {Object.values(cards).map((card) => (
+    <div className="relative w-full h-screen overflow-hidden bg-transparent" data-testid="canvas">
+      {visibleCards.map((card) => (
         <ParcCardView key={card.id} card={card} />
       ))}
     </div>

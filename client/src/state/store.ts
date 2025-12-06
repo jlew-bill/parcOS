@@ -18,6 +18,9 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
   focusedCardId: null,
   workspaceName: "Creator Studio",
   isBillOpen: false,
+  minimizedCards: [],
+  filterStackId: null,
+  lastCardPositions: {},
 
   addCard: (card) => set((state) => ({
     cards: { ...state.cards, [card.id]: card }
@@ -38,21 +41,29 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
   }),
 
   setFocusedCard: (id) => set((state) => {
-    // Bring to front logic could be here (z-index)
-    // For now just marking focused
+    // Bring to front logic: set z-index to max + 1
     const maxZ = Math.max(...Object.values(state.cards).map(c => c.position.z), 0);
     const card = state.cards[id];
     
     if (!card) return { focusedCardId: id };
 
+    // Unfocus all other cards
+    const updatedCards: Record<string, ParcCard> = {};
+    Object.keys(state.cards).forEach(cid => {
+      updatedCards[cid] = {
+        ...state.cards[cid],
+        layoutState: { ...state.cards[cid].layoutState, focused: cid === id }
+      };
+    });
+
     return {
       focusedCardId: id,
       cards: {
-        ...state.cards,
+        ...updatedCards,
         [id]: {
-          ...card,
-          position: { ...card.position, z: maxZ + 1 },
-          layoutState: { ...card.layoutState, focused: true }
+          ...updatedCards[id],
+          position: { ...updatedCards[id].position, z: maxZ + 1 },
+          layoutState: { ...updatedCards[id].layoutState, focused: true }
         }
       }
     };
@@ -60,8 +71,6 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
 
   sendMessage: (msg) => {
     set((state) => ({ messages: [...state.messages, msg] }));
-    
-    // Simple routing logic / effects could go here
     if (msg.toId === 'broadcast') {
       console.log('Broadcast message:', msg);
     }
@@ -76,7 +85,63 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
   })),
 
   toggleBill: () => set((state) => ({ isBillOpen: !state.isBillOpen })),
-  setBillOpen: (isOpen) => set({ isBillOpen: isOpen })
+  setBillOpen: (isOpen) => set({ isBillOpen: isOpen }),
+
+  minimizeCard: (id) => set((state) => {
+    const card = state.cards[id];
+    if (!card) return state;
+    
+    return {
+      minimizedCards: [...state.minimizedCards, id],
+      lastCardPositions: { ...state.lastCardPositions, [id]: { x: card.position.x, y: card.position.y } },
+      cards: {
+        ...state.cards,
+        [id]: {
+          ...card,
+          layoutState: { ...card.layoutState, minimized: true }
+        }
+      }
+    };
+  }),
+
+  restoreCard: (id) => set((state) => {
+    const card = state.cards[id];
+    const lastPos = state.lastCardPositions[id];
+    
+    if (!card) return state;
+    
+    const maxZ = Math.max(...Object.values(state.cards).map(c => c.position.z), 0);
+    
+    return {
+      minimizedCards: state.minimizedCards.filter(cid => cid !== id),
+      cards: {
+        ...state.cards,
+        [id]: {
+          ...card,
+          layoutState: { ...card.layoutState, minimized: false, focused: true },
+          position: {
+            x: lastPos?.x ?? card.position.x,
+            y: lastPos?.y ?? card.position.y,
+            z: maxZ + 1
+          }
+        }
+      },
+      focusedCardId: id
+    };
+  }),
+
+  setStackFilter: (stackId) => set({ filterStackId: stackId }),
+
+  getVisibleCards: () => {
+    const state = get();
+    const allCards = Object.values(state.cards);
+    
+    if (state.filterStackId) {
+      return allCards.filter(card => card.stackId === state.filterStackId && !card.layoutState.minimized);
+    }
+    
+    return allCards.filter(card => !card.layoutState.minimized);
+  }
 }));
 
 // Helper to initialize some default state
@@ -137,12 +202,28 @@ export const initializeState = () => {
 
   apps.forEach(app => store.registerApp(app));
 
+  // Create initial stacks
+  const nilStack: ParcStack = {
+    id: nanoid(),
+    type: 'stack',
+    title: 'NIL Stack',
+    domain: 'nil',
+    cardIds: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    cmfk: INITIAL_CMFK,
+    metadata: {}
+  };
+
+  store.createStack(nilStack);
+
   // Create initial cards
   const card1: ParcCard = {
     id: nanoid(),
     type: 'card',
     title: 'NIL Deals Tracker',
     appId: 'nil-dashboard',
+    stackId: nilStack.id,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     cmfk: INITIAL_CMFK,
