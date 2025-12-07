@@ -1,5 +1,9 @@
 import React from 'react';
 import { Link } from 'wouter';
+import previewImg1 from '@assets/generated_images/hyperbar_os_workspace_interface.png';
+import previewImg2 from '@assets/generated_images/hyperbar_os_dashboard_view.png';
+import previewImg3 from '@assets/generated_images/hyperbar_os_knowledge_system.png';
+import previewImg4 from '@assets/generated_images/hyperbar_os_workspace_cards.png';
 
 export function Landing() {
   return (
