@@ -4,6 +4,7 @@ import { Canvas } from '@/components/Canvas';
 import { BillOverlay } from '@/components/BillOverlay';
 import { SpatialHUD } from '@/components/SpatialHUD';
 import { AnimatedBackground } from '@/components/AnimatedBackground';
+import { SpatialShell } from '@/spatial';
 import { initializeState, useParcOSStore } from '@/state/store';
 import { Toaster } from "@/components/ui/toaster";
 import { highlightEngine } from '@/services/highlight-engine';
@@ -68,6 +69,7 @@ function App() {
 
   return (
     <div className="w-full h-screen text-white overflow-visible font-sans selection:bg-indigo-500/30">
+      <SpatialShell />
       <AnimatedBackground />
       <Canvas />
       <SpatialHUD />

@@ -1,10 +1,11 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useParcOSStore } from '@/state/store';
 
 export function SpatialParticles() {
   const pointsRef = useRef<THREE.Points>(null);
+  const geometryRef = useRef<THREE.BufferGeometry>(null);
   const userCMFK = useParcOSStore((state) => state.userCMFK);
 
   const particleCount = 200;
@@ -29,15 +30,25 @@ export function SpatialParticles() {
     return { positions, colors };
   }, []);
 
+  useEffect(() => {
+    if (geometryRef.current) {
+      geometryRef.current.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometryRef.current.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    }
+  }, [positions, colors]);
+
   useFrame((state, delta) => {
-    if (pointsRef.current) {
+    if (pointsRef.current && geometryRef.current) {
       pointsRef.current.rotation.y += delta * 0.02;
       
-      const positionArray = pointsRef.current.geometry.attributes.position.array as Float32Array;
-      for (let i = 0; i < particleCount; i++) {
-        positionArray[i * 3 + 1] += Math.sin(state.clock.elapsedTime + i) * 0.001;
+      const positionAttr = geometryRef.current.attributes.position;
+      if (positionAttr) {
+        const positionArray = positionAttr.array as Float32Array;
+        for (let i = 0; i < particleCount; i++) {
+          positionArray[i * 3 + 1] += Math.sin(state.clock.elapsedTime + i) * 0.001;
+        }
+        positionAttr.needsUpdate = true;
       }
-      pointsRef.current.geometry.attributes.position.needsUpdate = true;
     }
   });
 
@@ -45,16 +56,7 @@ export function SpatialParticles() {
 
   return (
     <points ref={pointsRef}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          args={[positions, 3]}
-        />
-        <bufferAttribute
-          attach="attributes-color"
-          args={[colors, 3]}
-        />
-      </bufferGeometry>
+      <bufferGeometry ref={geometryRef} />
       <pointsMaterial
         size={size}
         vertexColors

@@ -35,7 +35,7 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
   highlightedTeam: null,
   cinemaCardId: null,
   cinemaOriginalState: null,
-  spatialEnabled: true,
+  spatialEnabled: false,
 
   addCard: (card) => {
     set((state) => ({
