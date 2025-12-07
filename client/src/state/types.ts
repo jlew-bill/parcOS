@@ -137,6 +137,9 @@ export interface ParcOSState {
     size: { width: number; height: number };
   } | null;
   
+  // Spatial 3D environment (VisionOS-style)
+  spatialEnabled: boolean;               // Feature flag for 3D spatial layer
+  
   // Actions
   addCard: (card: ParcCard) => void;
   updateCardPosition: (id: string, pos: { x: number; y: number }) => void;
@@ -191,4 +194,7 @@ export interface ParcOSState {
   
   // Spatial engine layout action
   recomputeSpatialLayout: (workspace?: string) => void;
+  
+  // Spatial 3D environment actions
+  setSpatialEnabled: (enabled: boolean) => void;
 }

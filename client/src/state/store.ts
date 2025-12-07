@@ -35,6 +35,7 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
   highlightedTeam: null,
   cinemaCardId: null,
   cinemaOriginalState: null,
+  spatialEnabled: true,
 
   addCard: (card) => {
     set((state) => ({
@@ -879,7 +880,9 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
     
     set({ cards: updatedCards });
     console.log(`[Spatial] Recomputed layout for ${cardsToLayout.length} cards`);
-  }
+  },
+
+  setSpatialEnabled: (enabled: boolean) => set({ spatialEnabled: enabled })
 }));
 
 // Helper to initialize some default state
