@@ -1,23 +1,10 @@
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, Suspense } from 'react';
 import { motion, PanInfo } from 'framer-motion';
 import { ParcCard, SnapZoneType } from '@/state/types';
 import { useParcOSStore } from '@/state/store';
 import { Minimize2, GripHorizontal, Play, X, Link2 } from 'lucide-react';
-import { NILDashboard } from '@/apps/NILDashboard';
-import { ClassroomBoard } from '@/apps/ClassroomBoard';
-import { GenericBrowserCard } from '@/apps/GenericBrowserCard';
 import { cmfkEngine } from '@/services/cmfk-engine';
-
-const SportsMultiView = React.lazy(() => import('@/apps/SportsMultiView').then(m => ({ default: m.SportsMultiView })));
-
-const AppRegistry: Record<string, React.FC<{ payload: any }>> = {
-  'sports-multiview': SportsMultiView,
-  'nil-dashboard': NILDashboard,
-  'classroom-board': ClassroomBoard,
-  'generic-browser': GenericBrowserCard,
-  'creator-studio': () => <div className="p-8 text-white/50 text-center">Creator Studio Placeholder</div>,
-  'system-tools': () => <div className="p-8 text-white/50 text-center">System Tools Placeholder</div>,
-};
+import { appRegistry } from '@/services/app-registry';
 
 const MIN_WIDTH = 280;
 const MIN_HEIGHT = 200;
@@ -102,8 +89,6 @@ export const ParcCardView: React.FC<{ card: ParcCard }> = ({ card }) => {
   const isFocused = card.layoutState.focused;
   const isSportsCinemaMode = activeWorkspace === 'SPORTS' && sportsMode === 'cinema' && isFocused;
   const isGlobalCinemaMode = cinemaCardId === card.id;
-
-  const App = card.appId ? AppRegistry[card.appId] : null;
 
   const maxZ = 10;
   const depthFactor = Math.min(Math.max(card.position.z / maxZ, 0.3), 1);
@@ -347,7 +332,9 @@ export const ParcCardView: React.FC<{ card: ParcCard }> = ({ card }) => {
 
       {/* Content */}
       <div className="flex-1 overflow-auto relative custom-scrollbar">
-        {App ? <App payload={card.payload} /> : <div className="p-4 text-white/50">Unknown App</div>}
+        <Suspense fallback={<div className="p-4 text-white/50">Loading...</div>}>
+          {appRegistry.render(card.appId || '', { payload: card.payload, cardId: card.id })}
+        </Suspense>
       </div>
 
       {/* CMFK Indicator (Footer) */}
