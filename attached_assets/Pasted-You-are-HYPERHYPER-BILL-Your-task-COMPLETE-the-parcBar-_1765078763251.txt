@@ -1,0 +1,152 @@
+You are HYPERHYPER BILL.  
+Your task: COMPLETE the parcBar Sports Mode for the PARC OS, fully enabling users to watch TWO football games side-by-side with all required OS, UI, routing, gating, and video functionality.
+
+Everything below must be created or completed.
+
+============================================================
+PHASE 1 — Integrate with Existing OS Window System
+============================================================
+• Detect existing OS window manager and window chrome style.
+• Create a new window type: "video".
+• Define video window props: { id, src, title, x, y, width, height }.
+• Video windows must be draggable and resizable using existing OS logic.
+
+Output:
+- VideoWindow.tsx (or .jsx depending on project)
+- Window registration inside OS manager
+
+============================================================
+PHASE 2 — Embed Two Independent Video Players
+============================================================
+Create TWO independent instances:
+
+1. <VideoPlayerA />  
+2. <VideoPlayerB />
+
+Each must:
+• Accept a video source (iframe or video tag)
+• Support play/pause
+• Support mute/unmute
+• Support fullscreen
+• Render inside OS window chrome
+
+============================================================
+PHASE 3 — Stream Source Selector (Per Window)
+============================================================
+Create a UI component <StreamSelector /> with categories:
+
+• YouTube Live
+• Twitch Sports
+• Official NCAA embeds
+• Team highlight channels
+• Local broadcaster recap streams
+• Custom URL input
+
+When a user selects a stream:
+=> update that window's src dynamically.
+
+Connect this selector to the Sports Bar UI.
+
+============================================================
+PHASE 4 — Complete parcBar App
+============================================================
+Use the existing Sports Bar UI from the screenshot and extend it:
+
+• Add “Watch Game” buttons for each matchup:
+   - "Watch Game A" → Opens VideoWindowA
+   - "Watch Game B" → Opens VideoWindowB
+
+• Add a “Dual Stream Mode” button:
+   - Auto-opens *both* windows
+   - Auto-snap side-by-side
+
+• Add a new /parcbar route
+   - When visited, opens the Sports Bar app inside HyperBar OS
+
+UI requirements:
+• Match existing dark/glass theme
+• Smooth transitions
+• Scrollable scoreboard as already shown in screenshot
+
+============================================================
+PHASE 5 — Split View Side-by-Side Layout System
+============================================================
+Implement a simple layout engine:
+
+When split view is enabled:
+• VideoWindowA.x = 0
+• VideoWindowA.width = 50%
+• VideoWindowB.x = 50%
+• VideoWindowB.width = 50%
+• Maintain height automatically
+• Disable overlap temporarily
+
+Add a toggle button inside parcBar:
+“Split View Mode”
+
+============================================================
+PHASE 6 — Sports Overlay System (Minimal Implementation)
+============================================================
+For each video window, create a top overlay bar:
+
+Fields:
+• Team A (dropdown selector)
+• Team B (dropdown selector)
+• Score A, Score B (manual int input)
+• Game clock (manual text input)
+• Stadium/league badge (optional)
+
+Use translucent bar + small team logo placeholders.
+
+============================================================
+PHASE 7 — Monetization Gating via Stripe
+============================================================
+Use stripe.auto.json to determine user access.
+
+parcBar access requires ANY of:
+• Early Access
+• Athlete Pro
+• CreatorFlow Pro
+• Team Suite
+• District Suite
+
+If user is not eligible:
+Show paywall window:
+
+    🔒 Unlock Sports Mode
+    Watch two games side-by-side inside PARC OS.
+
+    [ Get Early Access — link_from_stripe.auto.json ]
+    [ Upgrade to Pro — link_from_stripe.auto.json ]
+
+• Prevent video windows from opening until user pays.
+• Once unlocked, gate must stay open for session.
+
+============================================================
+PHASE 8 — OS Dock + Routing Integration
+============================================================
+• Add a football 🏈 icon to the OS dock.
+• Clicking opens /parcbar in an OS window.
+• Add keyboard shortcut CTRL+SHIFT+S → open parcBar.
+
+============================================================
+PHASE 9 — Clean Up & Output
+============================================================
+• Clean unused imports.
+• Ensure TypeScript/JavaScript consistency.
+• Output ALL changed or new files:
+   - ParcBar.tsx
+   - VideoWindow.tsx or VideoWindow.jsx
+   - VideoPlayer components
+   - StreamSelector component
+   - Updated router file
+   - Updated OS dock file
+   - Updated NIL/CreatorFlow gating logic
+   - Any helper modules
+
+• Ensure no console errors.
+• Ensure split mode works on desktop + mobile.
+
+Finish by printing EXACTLY:
+
+“HYPERHYPER BILL: parcBar Dual-Stream EXPERIENCE COMPLETE.”
