@@ -1,0 +1,118 @@
+You are HYPERHYPER BILL. Create the full “parcBar” Sports Mode app for the PARC ecosystem, enabling users to watch TWO football games side-by-side inside HyperBar OS.
+
+Build EVERYTHING required for dual-stream viewing, window snapping, routing, UI, and monetization gating.
+
+============================================================
+PHASE 1 — Create parcBar App Structure
+============================================================
+1. Add a new module /app/parcBar or /src/apps/parcBar (match project style).
+2. Create a main component: ParcBar.tsx (or .jsx).
+3. Add routing so that visiting /parcbar loads the ParcBar app.
+4. Add an icon entry in the OS Dock labeled “parcBar” with a football or sports emoji.
+5. When launched, parcBar should open in a full-window workspace inside HyperBar.
+
+============================================================
+PHASE 2 — Dual Video Player Components
+============================================================
+Create TWO fully independent video player windows:
+
+• <VideoWindowA />
+• <VideoWindowB />
+
+Each must include:
+- <video> or iframe streaming component
+- play / pause
+- mute / volume slider
+- fullscreen
+- replaceable stream source
+- window frame with OS-style chrome
+- drag + resize support (use existing OS window manager if available)
+
+============================================================
+PHASE 3 — Split View (Side-by-Side) Layout System
+============================================================
+Implement a “Split View” feature:
+
+• A button “Split View Mode” arranges the two players side-by-side.
+• Left = Window A, Right = Window B.
+• Windows snap to 50% width each.
+• Responsive layout on mobile and desktop.
+• Allow users to drag the divider (bonus).
+
+============================================================
+PHASE 4 — Stream Source Selector (per window)
+============================================================
+Each window should have a “Choose Stream” dropdown with categories:
+
+1. YouTube Live
+2. Twitch Sports
+3. NCAA official streams
+4. Team highlight channels
+5. Local broadcaster recap streams
+6. “Custom URL”
+
+Implement:
+- A modal or dropdown to change the stream.
+- Update the iframe/video src dynamically.
+- Default to placeholder highlight videos.
+
+============================================================
+PHASE 5 — Sports Overlay UI
+============================================================
+Add optional overlays:
+- Team name selector (dropdown)
+- Team logo (use logo placeholders for now)
+- Scoreboard box (manual input fields for now)
+- Clock (timer input or static field)
+
+Place overlay at top of each window in a translucent bar.
+
+============================================================
+PHASE 6 — Monetization Gating (Stripe Integration)
+============================================================
+Implement gating using stripe.auto.json:
+
+• parcBar is LOCKED unless:
+   - user has Early Access, OR
+   - user has Athlete Pro, OR
+   - user has CreatorFlow Pro
+
+Display gate screen:
+   - Title: “Unlock Sports Mode”
+   - Text: “Watch two games at once — available with Early Access or Pro tiers.”
+   - Buttons:
+       * “Get Early Access — 0.99” → payment link from stripe.auto.json
+       * “Upgrade to Pro” → corresponding payment links
+   - Show feature preview cards (dual-stream, overlays, team mode).
+
+When unlocked, users can access full parcBar functionality.
+
+============================================================
+PHASE 7 — Dock + OS Integration
+============================================================
+Add to OS Dock:
+- parcBar icon
+- Clicking launches /parcbar inside the OS window manager
+- Allow parcBar windows to sit alongside other OS windows
+
+Add global shortcut:
+CTRL+SHIFT+S → open parcBar immediately.
+
+============================================================
+PHASE 8 — Code Quality & Output
+============================================================
+• Clean unused imports.
+• Ensure TypeScript types are correct (if using TS).
+• Validate no console errors.
+• Ensure responsiveness.
+• Output ALL new or modified files:
+   - ParcBar.tsx
+   - VideoWindowA/B components
+   - SplitView layout component
+   - Updated router
+   - Updated OS dock config
+   - Gating components using Stripe data
+   - Any new styles or helpers
+
+Finish by printing:
+“HYPERHYPER BILL: parcBar Dual-Stream COMPLETE.”
