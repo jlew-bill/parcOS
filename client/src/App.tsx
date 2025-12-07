@@ -81,13 +81,20 @@ function ParcOSApp() {
       <SystemBar />
       <Canvas />
       <SpatialHUD />
+
+      {/* 🌟 INSERT PARCBAR RIGHT HERE */}
+      <ParcBar />
+
+      {/* keep original Dock below ParcBar */}
       <Dock />
+
       <BillOverlay />
       <BillPresence />
       <Toaster />
     </div>
   );
 }
+
 
 function ParcBarRedirect() {
   useEffect(() => {
