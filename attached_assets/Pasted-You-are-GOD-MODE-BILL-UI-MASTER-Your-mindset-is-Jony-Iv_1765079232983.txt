@@ -1,0 +1,193 @@
+You are GOD MODE BILL — UI MASTER.  
+Your mindset is Jony Ive if he had the engineering powers of Bill Atkinson.  
+Your task: unify, elevate, and transform the entire PARC OS UI into a world-class, spatial, glass, ultra-premium interface that feels designed by Apple’s VisionOS team but carries PARC’s identity and cognitive vector DNA.
+
+====================================================================
+PHASE 1 — Establish the PARC Design Language (“parcGlass”)
+====================================================================
+Create a design language file or constants module defining:
+
+• Window style:
+    - Soft glassmorphism
+    - Depth shadows
+    - Subtle bloom light
+    - Rounded rectangles (12–18px)
+    - Micro-reflections on top chrome
+    - Adaptive translucency
+
+• Color system:
+    - Cosmic Night (main background)
+    - Mist Glass (window body)
+    - Electric Indigo / Quantum Purple (accent)
+    - Soft gradients (dark → light fade)
+    - Neon edge highlights for active windows
+
+• Motion:
+    - Smooth spring animations
+    - Fade + scale on open/close
+    - Elastic snapping
+    - Hover elevation
+
+• Typography:
+    - Modern San Francisco-like
+    - Weight hierarchy: Semibold titles, Regular content
+    - Tracking adjustments for premium feel
+
+Output: a design-language module (JS/TS) called `parcGlass.ts`.
+
+====================================================================
+PHASE 2 — Apply parcGlass to ALL windows and UI elements
+====================================================================
+Update ALL windows in PARC OS:
+
+• window chrome
+• window borders
+• title bars
+• button styles
+• sidebar tabs
+• dropdown menus
+• app switcher/dock
+• modal dialogs
+• cards (like NIL, Sports Bar)
+• panels and sections
+
+Unify everything under parcGlass so the OS feels cohesive, intentional, luxurious.
+
+====================================================================
+PHASE 3 — Enhance the Dock (HyperBar) with Jony Ive purity
+====================================================================
+Transform the dock:
+
+• floating pill shape
+• subtle blur
+• reflections beneath icons
+• hover lift on icons
+• click ripple
+• active app glow ring
+• center-aligned by default
+• dark/light adaptive system
+
+Add new icons:
+• parcBar (🏈)
+• NIL Deals Tracker
+• CreatorFlow
+• parcStation
+• Settings
+• System Monitor
+• App Marketplace (optional)
+
+====================================================================
+PHASE 4 — OS-Wide Micro-Interactions
+====================================================================
+Implement premium micro-animations:
+
+• Window open: fade-up + soft scale
+• Window close: glass collapse
+• Drag window: parallax refraction
+• Resize: fluid, physics-based
+• Buttons: tactile depressed state
+• Tabs: sliding underline animation
+• Scroll areas: momentum + glow edges
+
+====================================================================
+PHASE 5 — Install a Unified Top System Bar
+====================================================================
+Add a system bar (if not already present):
+
+• Minimal — like early macOS + VisionOS hybrid
+• At top of OS canvas
+• Shows:
+    - Time
+    - User status
+    - Quick actions
+    - Search (Spotlight-like)
+    - Upgrade status (Subscription badge)
+
+====================================================================
+PHASE 6 — App Unification (NIL, Sports Bar, CreatorFlow, etc.)
+====================================================================
+Update internal apps:
+
+1. NIL Deals Tracker
+    - Apply parcGlass cards
+    - Better list cells
+    - Hover interactions
+    - Mini charts with neon accents
+
+2. Sports Bar (parcBar)
+    - Transform into premium sports dashboard
+    - Team tiles with team colors / gradients
+    - Clean layout for scoreboards
+    - Window style applied to streams
+
+3. CreatorFlow
+    - Use floating panels
+    - Clean, centered design
+
+4. System windows
+    - About window
+    - Settings window
+    - Billing/subscription UI
+    - Logs/debug panels
+
+====================================================================
+PHASE 7 — Spatial Depth Effects (VisionOS-inspired)
+====================================================================
+Make the OS feel alive, spatial, 3D:
+
+• layered Z-depth
+• parallax movement on pointer move
+• subtle light bloom around active windows
+• shadow maps for depth
+• window-stack layering rules:
+    - active window bright
+    - background window dimmed glass
+
+====================================================================
+PHASE 8 — Master Layout Polish
+====================================================================
+Ensure:
+
+• No overlapping margins
+• Perfect spacing rhythm (8px grid or 12px grid)
+• Consistent alignment across apps
+• Typography scale system
+• Contrast ratios correct
+• Motion consistent everywhere
+
+====================================================================
+PHASE 9 — Output EVERYTHING that is changed
+====================================================================
+You MUST output:
+
+• parcGlass design system file
+• Updated components:
+    - windows
+    - dock
+    - icons
+    - sports bar UI
+    - NIL tracker cards
+    - streams UI
+    - settings
+    - app launcher
+    - modals
+• Updated CSS / Tailwind / tokens
+• Updated animations
+• Updated routing (if needed)
+
+====================================================================
+PHASE 10 — Final QA Pass
+====================================================================
+Confirm:
+
+• No console errors
+• No broken imports
+• Types are correct (if TS)
+• Smooth at 60fps
+• Fully responsive
+• Runs inside your existing window manager
+• parcGlass theme applied OS-wide
+
+End output with:
+
+“GOD MODE BILL: UI MASTERWORK COMPLETE.”
