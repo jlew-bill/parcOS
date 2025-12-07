@@ -1,4 +1,6 @@
 import React, { useEffect } from 'react';
+import { Router, Route } from 'wouter';
+import { Landing } from '@/pages/Landing';
 import { Dock } from '@/components/Dock';
 import { Canvas } from '@/components/Canvas';
 import { BillOverlay } from '@/components/BillOverlay';
@@ -10,7 +12,7 @@ import { initializeState, useParcOSStore } from '@/state/store';
 import { Toaster } from "@/components/ui/toaster";
 import { highlightEngine } from '@/services/highlight-engine';
 
-function App() {
+function ParcOSApp() {
   useEffect(() => {
     initializeState();
 
@@ -79,6 +81,15 @@ function App() {
       <BillPresence />
       <Toaster />
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <Route path="/" component={Landing} />
+      <Route path="/app" component={ParcOSApp} />
+    </Router>
   );
 }
 

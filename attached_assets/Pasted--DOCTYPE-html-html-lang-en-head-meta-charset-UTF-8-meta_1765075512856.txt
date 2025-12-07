@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PARC Real Intelligence</title>
+
+  <!-- Ultra-clean Apple-style font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #f7f7f7;
+      color: #111;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 0 20px;
+    }
+
+    .container {
+      max-width: 620px;
+      text-align: center;
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .tagline {
+      font-size: 1.25rem;
+      font-weight: 400;
+      margin-bottom: 30px;
+      color: #333;
+      line-height: 1.45;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #000;
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      margin-bottom: 18px;
+      letter-spacing: 0.4px;
+    }
+
+    .cta {
+      margin-top: 35px;
+    }
+
+    .cta a {
+      text-decoration: none;
+      display: inline-block;
+      background: #111;
+      color: #fff;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      transition: 0.2s ease;
+    }
+
+    .cta a:hover {
+      background: #333;
+      transform: translateY(-2px);
+    }
+
+    .links {
+      margin-top: 28px;
+      font-size: 0.95rem;
+      color: #444;
+    }
+
+    .links a {
+      color: #444;
+      text-decoration: underline;
+      margin: 0 10px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="badge">NEW • PARCOS v1</div>
+
+    <h1>PARC Real Intelligence</h1>
+
+    <div class="tagline">
+      The world’s first <b>state-based cognitive OS</b>.<br>
+      Powered by shape vectors.  
+      Syncs up to <b>20×–200× faster</b> than traditional AI.
+    </div>
+
+    <div class="cta">
+      <!-- Replace # with your Stripe link -->
+      <a href="#" target="_blank">Get Early Access — $0.99</a>
+    </div>
+
+    <div class="links">
+      <a href="https://mynil.parcri.net">myNIL</a>
+      <a href="#">parcStation (coming)</a>
+      <a href="#">parcBoard</a>
+    </div>
+  </div>
+</body>
+</html>
