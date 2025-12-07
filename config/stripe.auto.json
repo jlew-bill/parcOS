@@ -1,0 +1,52 @@
+{
+  "early_access": {
+    "tierKey": "early_access",
+    "name": "Early Access Pass",
+    "productId": "prod_TYfv1cCmdnB5Qu",
+    "priceId": "price_1SbYZIGbSU9Ll8u3UCGLz8sD",
+    "paymentLinkId": "plink_1SbYZJGbSU9Ll8u39vJxyYiL",
+    "paymentLinkUrl": "https://buy.stripe.com/test_4gM00j98qdLw5mA6bD9ws00",
+    "priceAmount": 0.99,
+    "billingCycle": "one_time"
+  },
+  "athlete_pro": {
+    "tierKey": "athlete_pro",
+    "name": "Athlete Pro",
+    "productId": "prod_TYfvHssXynHizP",
+    "priceId": "price_1SbYZJGbSU9Ll8u3HXtUYMiC",
+    "paymentLinkId": "plink_1SbYZKGbSU9Ll8u3xpSdqdJD",
+    "paymentLinkUrl": "https://buy.stripe.com/test_8x26oHesK9vg16k43v9ws01",
+    "priceAmount": 4.99,
+    "billingCycle": "monthly"
+  },
+  "creator_pro": {
+    "tierKey": "creator_pro",
+    "name": "CreatorFlow Pro",
+    "productId": "prod_TYfv2cmCkvKnws",
+    "priceId": "price_1SbYZKGbSU9Ll8u3XfliovsM",
+    "paymentLinkId": "plink_1SbYZLGbSU9Ll8u3Yjsba9JF",
+    "paymentLinkUrl": "https://buy.stripe.com/test_bJefZh5We22O16k7fH9ws02",
+    "priceAmount": 9.99,
+    "billingCycle": "monthly"
+  },
+  "team_suite": {
+    "tierKey": "team_suite",
+    "name": "Coach / Team Suite",
+    "productId": "prod_TYfvTZogizwleI",
+    "priceId": "price_1SbYZLGbSU9Ll8u3SXCpL5om",
+    "paymentLinkId": "plink_1SbYZMGbSU9Ll8u3UOo0YlCx",
+    "paymentLinkUrl": "https://buy.stripe.com/test_bJedR970icHsg1e57z9ws03",
+    "priceAmount": 29,
+    "billingCycle": "monthly"
+  },
+  "district_suite": {
+    "tierKey": "district_suite",
+    "name": "District Suite",
+    "productId": "prod_TYfvo97IbRAjkc",
+    "priceId": "price_1SbYZMGbSU9Ll8u34el0JAy9",
+    "paymentLinkId": "plink_1SbYZMGbSU9Ll8u3LGFcnNVn",
+    "paymentLinkUrl": "https://buy.stripe.com/test_dRm6oHfwO6j49CQ43v9ws04",
+    "priceAmount": 299,
+    "billingCycle": "monthly"
+  }
+}
