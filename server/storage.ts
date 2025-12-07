@@ -19,6 +19,8 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUserSubscription(userId: string, tier: string): Promise<User | undefined>;
+  updateUserPassword(userId: string, newPassword: string): Promise<void>;
   
   getHighlights(gameId?: string): Promise<Highlight[]>;
   createHighlight(highlight: InsertHighlight): Promise<Highlight>;
@@ -46,6 +48,20 @@ export class DatabaseStorage implements IStorage {
   async createUser(insertUser: InsertUser): Promise<User> {
     const [user] = await db.insert(users).values(insertUser).returning();
     return user;
+  }
+
+  async updateUserSubscription(userId: string, tier: string): Promise<User | undefined> {
+    const [user] = await db.update(users)
+      .set({ subscriptionTier: tier })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  async updateUserPassword(userId: string, newPassword: string): Promise<void> {
+    await db.update(users)
+      .set({ password: newPassword })
+      .where(eq(users.id, userId));
   }
 
   async getHighlights(gameId?: string): Promise<Highlight[]> {

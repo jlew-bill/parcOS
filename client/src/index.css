@@ -67,3 +67,45 @@ body {
 .text-shadow {
   text-shadow: 0 2px 10px rgba(0,0,0,0.5);
 }
+
+/* Performance optimizations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* GPU acceleration for animations */
+.glass-panel,
+.glass-panel-dark,
+.glass-button {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Will-change hints for frequently animated elements */
+[data-animating="true"] {
+  will-change: transform, opacity;
+}
+
+/* Reduced motion accessibility support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .glass-panel,
+  .glass-panel-dark,
+  .glass-button {
+    transition: none !important;
+  }
+}
