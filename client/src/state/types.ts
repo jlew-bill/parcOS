@@ -58,7 +58,34 @@ export interface ParcMessage {
   timestamp: string;
 }
 
+export type SnapZoneType = 'left' | 'right' | 'center' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'left-third' | 'center-third' | 'right-third';
+
+export interface SnapZoneDefinition {
+  x: number | string;
+  y: number | string;
+  width: string;
+  height: string;
+}
+
+export const SNAP_ZONE_DEFINITIONS: Record<SnapZoneType, SnapZoneDefinition> = {
+  'left': { x: 0, y: 48, width: '50%', height: 'calc(100% - 48px)' },
+  'right': { x: '50%', y: 48, width: '50%', height: 'calc(100% - 48px)' },
+  'center': { x: '15%', y: '15%', width: '70%', height: '70%' },
+  'top-left': { x: 0, y: 48, width: '50%', height: 'calc(50% - 24px)' },
+  'top-right': { x: '50%', y: 48, width: '50%', height: 'calc(50% - 24px)' },
+  'bottom-left': { x: 0, y: 'calc(50% + 24px)', width: '50%', height: 'calc(50% - 24px)' },
+  'bottom-right': { x: '50%', y: 'calc(50% + 24px)', width: '50%', height: 'calc(50% - 24px)' },
+  'left-third': { x: 0, y: 48, width: '33.333%', height: 'calc(100% - 48px)' },
+  'center-third': { x: '33.333%', y: 48, width: '33.333%', height: 'calc(100% - 48px)' },
+  'right-third': { x: '66.666%', y: 48, width: '33.333%', height: 'calc(100% - 48px)' }
+};
+
 export type HighlightType = 'score_change' | 'lead_change' | 'run' | 'momentum_reversal' | 'injury' | 'turnover' | 'big_play';
+
+export interface CardLink {
+  cardIds: string[];
+  linkType: string;
+}
 
 export interface Highlight {
   id: string;
@@ -94,6 +121,18 @@ export interface ParcOSState {
   lastCardPositions: Record<string, { x: number; y: number }>; // For restore
   highlights: Highlight[];
   highlightTimelineScroll: number;
+  activeSnapZone: SnapZoneType | null;   // Currently active snap zone
+  isDragging: boolean;                    // Whether a card is being dragged
+  draggingCardId: string | null;          // ID of card being dragged
+  linkedCards: CardLink[];               // Cross-card linking state
+  highlightedTeam: string | null;        // Currently highlighted team for NIL/Sports linking
+  
+  // Global cinema mode (independent of SPORTS cinema)
+  cinemaCardId: string | null;           // Card currently in cinema mode
+  cinemaOriginalState: {                  // Saved state for restoring after cinema exit
+    position: { x: number; y: number; z: number };
+    size: { width: number; height: number };
+  } | null;
   
   // Actions
   addCard: (card: ParcCard) => void;
@@ -118,4 +157,29 @@ export interface ParcOSState {
   loadHighlightsFromApi: (gameId?: string) => Promise<void>;
   saveWorkspaceState: (workspaceName: string, stackId: string) => Promise<void>;
   loadWorkspaceState: (workspaceName: string, stackId: string) => Promise<boolean>;
+  setActiveSnapZone: (zone: SnapZoneType | null) => void;
+  setDragging: (isDragging: boolean, cardId: string | null) => void;
+  snapCardToZone: (cardId: string, zone: SnapZoneType) => void;
+  
+  // BILL window management actions
+  tileCards: () => { count: number; cols: number; rows: number };
+  cascadeCards: () => { count: number };
+  gridLayout: () => { count: number; cols: number; rows: number };
+  stackCards: () => { count: number };
+  minimizeAllCards: () => { count: number };
+  restoreAllCards: () => { count: number };
+  focusCardByName: (name: string) => { found: boolean; cardId?: string; title?: string };
+  snapCurrentCard: (zone: 'left' | 'right' | 'center') => { success: boolean; cardId?: string };
+  closeCard: (id: string) => void;
+  updateCardSize: (id: string, size: { width: number; height: number }) => void;
+  
+  // Card linking actions
+  linkCards: (cardId1: string, cardId2: string, linkType: string) => void;
+  unlinkCards: (cardId1: string, cardId2: string) => void;
+  getLinkedCards: (cardId: string) => string[];
+  setHighlightedTeam: (team: string | null) => void;
+  
+  // Global cinema mode actions (QuickLook-style)
+  enterCinema: (cardId: string) => void;
+  exitCinema: () => void;
 }

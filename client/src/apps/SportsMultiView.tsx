@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Brain, Zap, TrendingUp, Sparkles, Activity, Users, Film } from 'lucide-react';
+import { Brain, Zap, TrendingUp, Sparkles, Activity, Users, Film, Link2 } from 'lucide-react';
 import { billSportsCommands } from '@/state/bill-sports-commands';
 import { useParcOSStore } from '@/state/store';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -8,6 +8,13 @@ import { SportsStack } from '@/components/SportsStack';
 import { HighlightCard } from '@/components/HighlightCard';
 import { Highlight } from '@/state/types';
 import { fetchAllSports, GameCard } from '@/services/sports-data';
+
+const teams = [
+  { name: 'Kansas City Chiefs', emoji: '🏈', record: '3-0 record' },
+  { name: 'Los Angeles Lakers', emoji: '🏀', record: '15-8 record' },
+  { name: 'Ohio State', emoji: '🎓', record: '#1 ranked' },
+  { name: 'Dallas Cowboys', emoji: '🏈', record: '8-4 record' },
+];
 
 const OddsView: React.FC = () => {
   const [games, setGames] = useState<GameCard[]>([]);
@@ -151,6 +158,8 @@ export const SportsMultiView: React.FC<{ payload: any }> = ({ payload }) => {
   const focusedCardId = useParcOSStore(s => s.focusedCardId);
   const cards = useParcOSStore(s => s.cards);
   const highlights = useParcOSStore(s => s.highlights);
+  const setHighlightedTeam = useParcOSStore(s => s.setHighlightedTeam);
+  const highlightedTeam = useParcOSStore(s => s.highlightedTeam);
   
   const currentCard = focusedCardId ? cards[focusedCardId] : null;
   const isCinemaMode = activeWorkspace === 'SPORTS' && sportsMode === 'cinema';
@@ -221,12 +230,40 @@ export const SportsMultiView: React.FC<{ payload: any }> = ({ payload }) => {
         <TabsContent value="teams" className="flex-1 overflow-y-auto p-4">
           <div className="space-y-3">
             <div className="p-4 rounded-lg bg-white/5 border border-white/10">
-              <h3 className="font-bold mb-2">Top Teams Today</h3>
-              <div className="space-y-1 text-sm text-white/70">
-                <div>🏈 Kansas City Chiefs - 3-0 record</div>
-                <div>🏀 Los Angeles Lakers - 15-8 record</div>
-                <div>🎓 Ohio State - #1 ranked</div>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-bold">Top Teams Today</h3>
+                {highlightedTeam && (
+                  <div className="flex items-center gap-1 px-2 py-0.5 bg-indigo-500/20 rounded-full border border-indigo-400/30">
+                    <Link2 className="w-3 h-3 text-indigo-400" />
+                    <span className="text-[10px] text-indigo-300 uppercase tracking-wide">Linked</span>
+                  </div>
+                )}
               </div>
+              <div className="space-y-2 text-sm">
+                {teams.map((team) => (
+                  <button
+                    key={team.name}
+                    onClick={() => setHighlightedTeam(highlightedTeam === team.name ? null : team.name)}
+                    className={`w-full text-left p-2 rounded-lg transition-all cursor-pointer ${
+                      highlightedTeam === team.name
+                        ? 'bg-indigo-500/30 ring-2 ring-indigo-400/50 text-white shadow-[0_0_15px_rgba(99,102,241,0.3)]'
+                        : 'bg-white/5 hover:bg-white/10 text-white/70 hover:text-white'
+                    }`}
+                    data-testid={`team-link-${team.name.replace(/\s+/g, '-').toLowerCase()}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span>{team.emoji} {team.name} - {team.record}</span>
+                      {highlightedTeam === team.name && (
+                        <Link2 className="w-4 h-4 text-indigo-400" />
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+              <p className="text-[10px] text-white/40 mt-3 flex items-center gap-1">
+                <Link2 className="w-3 h-3" />
+                Click a team to link NIL deals
+              </p>
             </div>
           </div>
         </TabsContent>

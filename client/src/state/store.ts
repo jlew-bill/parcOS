@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { ParcOSState, ParcCard, ParcStack, ParcApp, ParcMessage, CMFKVector, Highlight } from './types';
+import { ParcOSState, ParcCard, ParcStack, ParcApp, ParcMessage, CMFKVector, Highlight, SnapZoneType, SNAP_ZONE_DEFINITIONS, CardLink } from './types';
 import { nanoid } from 'nanoid';
 import { highlightsApi, workspacesApi, gameEventsApi } from '@/lib/api';
 
@@ -27,6 +27,13 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
   lastCardPositions: {},
   highlights: [],
   highlightTimelineScroll: 0,
+  activeSnapZone: null,
+  isDragging: false,
+  draggingCardId: null,
+  linkedCards: [],
+  highlightedTeam: null,
+  cinemaCardId: null,
+  cinemaOriginalState: null,
 
   addCard: (card) => set((state) => ({
     cards: { ...state.cards, [card.id]: card }
@@ -312,7 +319,459 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
       console.error('[Store] Failed to load workspace state:', err);
       return false;
     }
-  }
+  },
+
+  setActiveSnapZone: (zone) => set({ activeSnapZone: zone }),
+
+  setDragging: (isDragging, cardId) => set({ isDragging, draggingCardId: cardId }),
+
+  snapCardToZone: (cardId, zone) => set((state) => {
+    const card = state.cards[cardId];
+    if (!card) return state;
+
+    const zoneDef = SNAP_ZONE_DEFINITIONS[zone];
+    if (!zoneDef) return state;
+
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+
+    const parseValue = (value: number | string, total: number): number => {
+      if (typeof value === 'number') return value;
+      if (value.includes('%')) {
+        return (parseFloat(value) / 100) * total;
+      }
+      if (value.includes('calc')) {
+        const match = value.match(/calc\((\d+)%\s*([+-])\s*(\d+)px\)/);
+        if (match) {
+          const percent = parseFloat(match[1]);
+          const operator = match[2];
+          const pixels = parseFloat(match[3]);
+          const baseValue = (percent / 100) * total;
+          return operator === '+' ? baseValue + pixels : baseValue - pixels;
+        }
+      }
+      return parseFloat(value) || 0;
+    };
+
+    const newX = parseValue(zoneDef.x, windowWidth);
+    const newY = parseValue(zoneDef.y, windowHeight);
+    const newWidth = parseValue(zoneDef.width, windowWidth);
+    const newHeight = parseValue(zoneDef.height, windowHeight);
+
+    const maxZ = Math.max(...Object.values(state.cards).map(c => c.position.z), 0);
+
+    return {
+      cards: {
+        ...state.cards,
+        [cardId]: {
+          ...card,
+          position: { x: newX, y: newY, z: maxZ + 1 },
+          size: { width: newWidth, height: newHeight },
+          layoutState: { ...card.layoutState, focused: true }
+        }
+      },
+      focusedCardId: cardId,
+      activeSnapZone: null,
+      isDragging: false,
+      draggingCardId: null
+    };
+  }),
+
+  tileCards: () => {
+    const state = get();
+    const visibleCards = Object.values(state.cards).filter(c => !c.layoutState.minimized);
+    const count = visibleCards.length;
+    
+    if (count === 0) return { count: 0, cols: 0, rows: 0 };
+
+    const cols = Math.ceil(Math.sqrt(count));
+    const rows = Math.ceil(count / cols);
+    
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight - 48;
+    const padding = 20;
+    const cardWidth = (windowWidth - padding * (cols + 1)) / cols;
+    const cardHeight = (windowHeight - padding * (rows + 1)) / rows;
+
+    const updatedCards: Record<string, ParcCard> = { ...state.cards };
+    
+    visibleCards.forEach((card, idx) => {
+      const col = idx % cols;
+      const row = Math.floor(idx / cols);
+      
+      updatedCards[card.id] = {
+        ...card,
+        position: {
+          x: padding + col * (cardWidth + padding),
+          y: 48 + padding + row * (cardHeight + padding),
+          z: idx + 1
+        },
+        size: { width: cardWidth, height: cardHeight }
+      };
+    });
+
+    set({ cards: updatedCards });
+    console.log(`[BILL] Tiled ${count} cards in ${cols}x${rows} grid`);
+    return { count, cols, rows };
+  },
+
+  cascadeCards: () => {
+    const state = get();
+    const visibleCards = Object.values(state.cards).filter(c => !c.layoutState.minimized);
+    const count = visibleCards.length;
+    
+    if (count === 0) return { count: 0 };
+
+    const offsetX = 30;
+    const offsetY = 30;
+    const startX = 100;
+    const startY = 100;
+
+    const updatedCards: Record<string, ParcCard> = { ...state.cards };
+    
+    visibleCards.forEach((card, idx) => {
+      updatedCards[card.id] = {
+        ...card,
+        position: {
+          x: startX + idx * offsetX,
+          y: startY + idx * offsetY,
+          z: idx + 1
+        },
+        size: { width: 450, height: 400 }
+      };
+    });
+
+    set({ cards: updatedCards, focusedCardId: visibleCards[visibleCards.length - 1]?.id || null });
+    console.log(`[BILL] Cascaded ${count} cards`);
+    return { count };
+  },
+
+  gridLayout: () => {
+    const state = get();
+    const visibleCards = Object.values(state.cards).filter(c => !c.layoutState.minimized);
+    const count = visibleCards.length;
+    
+    if (count === 0) return { count: 0, cols: 0, rows: 0 };
+
+    let cols: number, rows: number;
+    if (count <= 2) {
+      cols = count;
+      rows = 1;
+    } else if (count <= 4) {
+      cols = 2;
+      rows = 2;
+    } else if (count <= 6) {
+      cols = 3;
+      rows = 2;
+    } else {
+      cols = 3;
+      rows = Math.ceil(count / 3);
+    }
+
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight - 48;
+    const gap = 16;
+    const cardWidth = (windowWidth - gap * (cols + 1)) / cols;
+    const cardHeight = (windowHeight - gap * (rows + 1)) / rows;
+
+    const updatedCards: Record<string, ParcCard> = { ...state.cards };
+    
+    visibleCards.forEach((card, idx) => {
+      const col = idx % cols;
+      const row = Math.floor(idx / cols);
+      
+      updatedCards[card.id] = {
+        ...card,
+        position: {
+          x: gap + col * (cardWidth + gap),
+          y: 48 + gap + row * (cardHeight + gap),
+          z: idx + 1
+        },
+        size: { width: cardWidth, height: cardHeight }
+      };
+    });
+
+    set({ cards: updatedCards });
+    console.log(`[BILL] Grid layout ${count} cards in ${cols}x${rows}`);
+    return { count, cols, rows };
+  },
+
+  stackCards: () => {
+    const state = get();
+    const visibleCards = Object.values(state.cards).filter(c => !c.layoutState.minimized);
+    const count = visibleCards.length;
+    
+    if (count === 0) return { count: 0 };
+
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    const cardWidth = 500;
+    const cardHeight = 400;
+    const centerX = (windowWidth - cardWidth) / 2;
+    const centerY = (windowHeight - cardHeight) / 2;
+
+    const updatedCards: Record<string, ParcCard> = { ...state.cards };
+    
+    visibleCards.forEach((card, idx) => {
+      updatedCards[card.id] = {
+        ...card,
+        position: {
+          x: centerX,
+          y: centerY,
+          z: idx + 1
+        },
+        size: { width: cardWidth, height: cardHeight }
+      };
+    });
+
+    set({ cards: updatedCards, focusedCardId: visibleCards[visibleCards.length - 1]?.id || null });
+    console.log(`[BILL] Stacked ${count} cards`);
+    return { count };
+  },
+
+  minimizeAllCards: () => {
+    const state = get();
+    const visibleCards = Object.values(state.cards).filter(c => !c.layoutState.minimized);
+    const count = visibleCards.length;
+    
+    if (count === 0) return { count: 0 };
+
+    const updatedCards: Record<string, ParcCard> = { ...state.cards };
+    const newMinimizedCards = [...state.minimizedCards];
+    const newLastPositions = { ...state.lastCardPositions };
+    
+    visibleCards.forEach(card => {
+      updatedCards[card.id] = {
+        ...card,
+        layoutState: { ...card.layoutState, minimized: true }
+      };
+      newMinimizedCards.push(card.id);
+      newLastPositions[card.id] = { x: card.position.x, y: card.position.y };
+    });
+
+    set({ 
+      cards: updatedCards, 
+      minimizedCards: newMinimizedCards,
+      lastCardPositions: newLastPositions,
+      focusedCardId: null 
+    });
+    console.log(`[BILL] Minimized ${count} cards`);
+    return { count };
+  },
+
+  restoreAllCards: () => {
+    const state = get();
+    const minimizedCardIds = state.minimizedCards;
+    const count = minimizedCardIds.length;
+    
+    if (count === 0) return { count: 0 };
+
+    const updatedCards: Record<string, ParcCard> = { ...state.cards };
+    let lastCardId: string | null = null;
+    
+    minimizedCardIds.forEach((cardId, idx) => {
+      const card = state.cards[cardId];
+      if (card) {
+        const lastPos = state.lastCardPositions[cardId];
+        updatedCards[cardId] = {
+          ...card,
+          layoutState: { ...card.layoutState, minimized: false },
+          position: {
+            x: lastPos?.x ?? card.position.x,
+            y: lastPos?.y ?? card.position.y,
+            z: idx + 1
+          }
+        };
+        lastCardId = cardId;
+      }
+    });
+
+    set({ 
+      cards: updatedCards, 
+      minimizedCards: [],
+      focusedCardId: lastCardId 
+    });
+    console.log(`[BILL] Restored ${count} cards`);
+    return { count };
+  },
+
+  focusCardByName: (name: string) => {
+    const state = get();
+    const lowerName = name.toLowerCase().trim();
+    const allCards = Object.values(state.cards);
+    
+    const matchedCard = allCards.find(card => 
+      card.title.toLowerCase().includes(lowerName) ||
+      lowerName.includes(card.title.toLowerCase())
+    );
+    
+    if (matchedCard) {
+      const maxZ = Math.max(...allCards.map(c => c.position.z), 0);
+      
+      const updatedCards: Record<string, ParcCard> = {};
+      Object.keys(state.cards).forEach(cid => {
+        updatedCards[cid] = {
+          ...state.cards[cid],
+          layoutState: { ...state.cards[cid].layoutState, focused: cid === matchedCard.id, minimized: false }
+        };
+      });
+      
+      updatedCards[matchedCard.id] = {
+        ...updatedCards[matchedCard.id],
+        position: { ...updatedCards[matchedCard.id].position, z: maxZ + 1 }
+      };
+
+      set({ 
+        cards: updatedCards, 
+        focusedCardId: matchedCard.id,
+        minimizedCards: state.minimizedCards.filter(id => id !== matchedCard.id)
+      });
+      console.log(`[BILL] Focused card: ${matchedCard.title}`);
+      return { found: true, cardId: matchedCard.id, title: matchedCard.title };
+    }
+    
+    console.log(`[BILL] Could not find card matching: ${name}`);
+    return { found: false };
+  },
+
+  snapCurrentCard: (zone: 'left' | 'right' | 'center') => {
+    const state = get();
+    const focusedCardId = state.focusedCardId;
+    
+    if (!focusedCardId) {
+      console.log('[BILL] No focused card to snap');
+      return { success: false };
+    }
+    
+    get().snapCardToZone(focusedCardId, zone);
+    console.log(`[BILL] Snapped card to ${zone}`);
+    return { success: true, cardId: focusedCardId };
+  },
+
+  closeCard: (id: string) => set((state) => {
+    const { [id]: removed, ...remainingCards } = state.cards;
+    return {
+      cards: remainingCards,
+      focusedCardId: state.focusedCardId === id ? null : state.focusedCardId,
+      minimizedCards: state.minimizedCards.filter(cid => cid !== id)
+    };
+  }),
+
+  updateCardSize: (id, size) => set((state) => {
+    const card = state.cards[id];
+    if (!card) return state;
+    return {
+      cards: {
+        ...state.cards,
+        [id]: { ...card, size }
+      }
+    };
+  }),
+
+  linkCards: (cardId1: string, cardId2: string, linkType: string) => set((state) => {
+    const existingLink = state.linkedCards.find(
+      link => link.cardIds.includes(cardId1) && link.cardIds.includes(cardId2)
+    );
+    if (existingLink) {
+      console.log('[Link] Cards already linked:', cardId1, cardId2);
+      return state;
+    }
+    const newLink: CardLink = { cardIds: [cardId1, cardId2], linkType };
+    console.log('[Link] Linking cards:', cardId1, cardId2, linkType);
+    return { linkedCards: [...state.linkedCards, newLink] };
+  }),
+
+  unlinkCards: (cardId1: string, cardId2: string) => set((state) => {
+    const newLinkedCards = state.linkedCards.filter(
+      link => !(link.cardIds.includes(cardId1) && link.cardIds.includes(cardId2))
+    );
+    console.log('[Link] Unlinking cards:', cardId1, cardId2);
+    return { linkedCards: newLinkedCards, highlightedTeam: null };
+  }),
+
+  getLinkedCards: (cardId: string) => {
+    const state = get();
+    const linkedCardIds: string[] = [];
+    state.linkedCards.forEach(link => {
+      if (link.cardIds.includes(cardId)) {
+        link.cardIds.forEach(id => {
+          if (id !== cardId && !linkedCardIds.includes(id)) {
+            linkedCardIds.push(id);
+          }
+        });
+      }
+    });
+    return linkedCardIds;
+  },
+
+  setHighlightedTeam: (team: string | null) => set((state) => {
+    console.log('[Link] Setting highlighted team:', team);
+    return { highlightedTeam: team };
+  }),
+
+  enterCinema: (cardId: string) => set((state) => {
+    const card = state.cards[cardId];
+    if (!card) return state;
+
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    
+    const cinemaWidth = windowWidth * 0.7;
+    const cinemaHeight = windowHeight * 0.7;
+    const cinemaX = (windowWidth - cinemaWidth) / 2;
+    const cinemaY = (windowHeight - cinemaHeight) / 2;
+
+    const maxZ = Math.max(...Object.values(state.cards).map(c => c.position.z), 0);
+
+    console.log('[Cinema] Entering cinema mode for card:', cardId);
+
+    return {
+      cinemaCardId: cardId,
+      cinemaOriginalState: {
+        position: { ...card.position },
+        size: { ...card.size }
+      },
+      focusedCardId: cardId,
+      cards: {
+        ...state.cards,
+        [cardId]: {
+          ...card,
+          position: { x: cinemaX, y: cinemaY, z: maxZ + 100 },
+          size: { width: cinemaWidth, height: cinemaHeight },
+          layoutState: { ...card.layoutState, focused: true }
+        }
+      }
+    };
+  }),
+
+  exitCinema: () => set((state) => {
+    const cardId = state.cinemaCardId;
+    const originalState = state.cinemaOriginalState;
+    
+    if (!cardId || !originalState) {
+      return { cinemaCardId: null, cinemaOriginalState: null };
+    }
+
+    const card = state.cards[cardId];
+    if (!card) {
+      return { cinemaCardId: null, cinemaOriginalState: null };
+    }
+
+    console.log('[Cinema] Exiting cinema mode for card:', cardId);
+
+    return {
+      cinemaCardId: null,
+      cinemaOriginalState: null,
+      cards: {
+        ...state.cards,
+        [cardId]: {
+          ...card,
+          position: originalState.position,
+          size: originalState.size
+        }
+      }
+    };
+  })
 }));
 
 // Helper to initialize some default state

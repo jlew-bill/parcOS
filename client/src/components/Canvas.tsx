@@ -5,6 +5,7 @@ import { useParcOSStore } from '@/state/store';
 import { ParcCardView } from './ParcCardView';
 import { HighlightCard } from './HighlightCard';
 import { HighlightTimeline } from './HighlightTimeline';
+import { SnapZoneOverlay } from './SnapZoneOverlay';
 import { highlightEngine } from '@/services/highlight-engine';
 
 export const CinemaLayout: React.FC<{ cards: ParcCard[] }> = ({ cards }) => {
@@ -107,24 +108,56 @@ export const Canvas: React.FC = () => {
   const sportsMode = useParcOSStore(state => state.sportsMode);
   const highlights = useParcOSStore(state => state.highlights);
   const addHighlight = useParcOSStore(state => state.addHighlight);
+  const cinemaCardId = useParcOSStore(state => state.cinemaCardId);
+  const exitCinema = useParcOSStore(state => state.exitCinema);
   
   const visibleCards = getVisibleCards();
-  const isCinemaMode = activeWorkspace === 'SPORTS' && sportsMode === 'cinema';
+  const isSportsCinemaMode = activeWorkspace === 'SPORTS' && sportsMode === 'cinema';
+  const isGlobalCinemaMode = cinemaCardId !== null;
 
   useEffect(() => {
     const callback = (highlight: any) => addHighlight(highlight);
     highlightEngine.onHighlight(callback);
   }, [addHighlight]);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isGlobalCinemaMode) {
+        exitCinema();
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isGlobalCinemaMode, exitCinema]);
+
   // Get recent highlights for right sidebar in normal mode
   const recentHighlights = highlights.slice(-3);
 
   return (
     <div className="fixed top-12 left-0 right-0 bottom-0 w-full min-h-[calc(100vh-3rem)] overflow-visible bg-transparent z-10" data-testid="canvas">
-      {isCinemaMode ? (
+      {isSportsCinemaMode ? (
         <CinemaLayout cards={visibleCards} />
       ) : (
         <div className="relative w-full h-full overflow-visible flex">
+          {/* Snap zone overlay - render below cards */}
+          <SnapZoneOverlay />
+          
+          {/* Global Cinema Mode Overlay */}
+          <AnimatePresence>
+            {isGlobalCinemaMode && (
+              <motion.div
+                className="fixed inset-0 bg-black/70 backdrop-blur-md z-40 cursor-pointer"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                onClick={exitCinema}
+                data-testid="global-cinema-overlay"
+              />
+            )}
+          </AnimatePresence>
+          
           {/* Main canvas area */}
           <div className="flex-1 overflow-visible">
             {visibleCards.map((card) => (
