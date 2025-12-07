@@ -1,6 +1,7 @@
 import React from 'react';
 import { TrendingUp, Link2, X } from 'lucide-react';
 import { useParcOSStore } from '@/state/store';
+import { parcGlass, glassStyles } from '@/design/parcGlass';
 
 const mockDeals = [
   { brand: 'Nike', type: 'Apparel', value: '$15k', status: 'Negotiating', team: 'Cowboys', athlete: 'CeeDee Lamb' },
@@ -22,17 +23,32 @@ export const NILDashboard: React.FC<{ payload: any }> = ({ payload }) => {
   const displayDeals = highlightedTeam ? filteredDeals : mockDeals.slice(0, 4);
 
   return (
-    <div className="p-6 h-full flex flex-col gap-6 text-white">
+    <div 
+      className="p-6 h-full flex flex-col gap-6 text-white"
+      style={{ padding: parcGlass.spacing.cardPadding }}
+    >
       {highlightedTeam && (
-        <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-indigo-500/20 border border-indigo-400/30 animate-pulse">
+        <div 
+          className="flex items-center justify-between px-3 py-2 animate-pulse"
+          style={{
+            borderRadius: parcGlass.radius.lg,
+            background: 'hsla(245, 90%, 65%, 0.15)',
+            border: parcGlass.borders.accent,
+          }}
+        >
           <div className="flex items-center gap-2">
             <Link2 className="w-4 h-4 text-indigo-300" />
-            <span className="text-sm text-indigo-200">Linked to: <strong>{highlightedTeam}</strong></span>
-            <span className="text-xs text-indigo-300/70">({filteredDeals.length} deals)</span>
+            <span style={{ fontSize: parcGlass.typography.fontSize.sm, color: 'hsla(245, 90%, 80%, 1)' }}>
+              Linked to: <strong>{highlightedTeam}</strong>
+            </span>
+            <span style={{ fontSize: parcGlass.typography.fontSize.xs, color: 'hsla(245, 90%, 65%, 0.7)' }}>
+              ({filteredDeals.length} deals)
+            </span>
           </div>
           <button 
             onClick={() => setHighlightedTeam(null)}
-            className="p-1 hover:bg-indigo-500/30 rounded-full transition-colors"
+            className="p-1 transition-colors hover:opacity-80"
+            style={{ borderRadius: parcGlass.radius.full }}
             data-testid="button-clear-highlight"
           >
             <X className="w-4 h-4 text-indigo-300" />
@@ -41,25 +57,69 @@ export const NILDashboard: React.FC<{ payload: any }> = ({ payload }) => {
       )}
 
       <div className="grid grid-cols-2 gap-4">
-        <div className="bg-white/5 rounded-2xl p-4 border border-white/10">
-           <div className="text-xs text-white/50 uppercase tracking-wider mb-1">Total Valuation</div>
-           <div className="text-2xl font-bold flex items-baseline gap-2">
+        <div 
+          style={{
+            ...glassStyles.card,
+            padding: parcGlass.spacing.cardPadding,
+          }}
+        >
+           <div style={{ fontSize: parcGlass.typography.fontSize.xs, color: 'hsla(0, 0%, 100%, 0.5)', letterSpacing: parcGlass.typography.letterSpacing.wider, marginBottom: parcGlass.spacing[1] }}>
+             TOTAL VALUATION
+           </div>
+           <div className="flex items-baseline gap-2" style={{ fontSize: parcGlass.typography.fontSize['2xl'], fontWeight: 700 }}>
              ${payload.totalValue?.toLocaleString() || '0'}
-             <span className="text-xs font-normal text-green-400 flex items-center gap-0.5"><TrendingUp className="w-3 h-3" /> +12%</span>
+             <span 
+               className="flex items-center gap-0.5"
+               style={{
+                 fontSize: parcGlass.typography.fontSize.xs,
+                 fontWeight: 400,
+                 color: parcGlass.colors.accent.success,
+              }}
+             >
+               <TrendingUp className="w-3 h-3" /> +12%
+             </span>
            </div>
         </div>
-        <div className="bg-white/5 rounded-2xl p-4 border border-white/10">
-           <div className="text-xs text-white/50 uppercase tracking-wider mb-1">Active Deals</div>
-           <div className="text-2xl font-bold">{highlightedTeam ? filteredDeals.length : (payload.deals || 0)}</div>
+        <div 
+          style={{
+            ...glassStyles.card,
+            padding: parcGlass.spacing.cardPadding,
+          }}
+        >
+           <div style={{ fontSize: parcGlass.typography.fontSize.xs, color: 'hsla(0, 0%, 100%, 0.5)', letterSpacing: parcGlass.typography.letterSpacing.wider, marginBottom: parcGlass.spacing.1 }}>
+             ACTIVE DEALS
+           </div>
+           <div style={{ fontSize: parcGlass.typography.fontSize['2xl'], fontWeight: 700 }}>
+             {highlightedTeam ? filteredDeals.length : (payload.deals || 0)}
+           </div>
         </div>
       </div>
 
-      <div className="flex-1 bg-white/5 rounded-2xl border border-white/10 overflow-hidden flex flex-col">
-        <div className="px-4 py-3 border-b border-white/10 flex justify-between items-center">
-            <span className="text-sm font-medium">
+      <div 
+        className="flex-1 overflow-hidden flex flex-col"
+        style={{
+          ...glassStyles.card,
+          borderRadius: parcGlass.radius.lg,
+        }}
+      >
+        <div 
+          className="px-4 py-3 flex justify-between items-center"
+          style={{
+            borderBottom: parcGlass.borders.thin,
+          }}
+        >
+            <span style={{ fontSize: parcGlass.typography.fontSize.sm, fontWeight: 500 }}>
               {highlightedTeam ? `${highlightedTeam} Athletes` : 'Recent Opportunities'}
             </span>
-            <button className="text-xs text-indigo-300 hover:text-indigo-200">View All</button>
+            <button 
+              style={{
+                fontSize: parcGlass.typography.fontSize.xs,
+                color: parcGlass.colors.electricIndigo[300],
+              }}
+              className="hover:opacity-80"
+            >
+              View All
+            </button>
         </div>
         <div className="flex-1 overflow-y-auto p-2 space-y-2">
             {displayDeals.map((deal, i) => {
@@ -67,34 +127,66 @@ export const NILDashboard: React.FC<{ payload: any }> = ({ payload }) => {
                 return (
                   <div 
                     key={i} 
-                    className={`flex items-center justify-between p-3 rounded-xl transition-all group cursor-pointer ${
-                      isHighlighted 
-                        ? 'bg-indigo-500/20 ring-2 ring-indigo-400/50 shadow-[0_0_15px_rgba(99,102,241,0.3)]' 
-                        : 'hover:bg-white/5'
-                    }`}
+                    className="flex items-center justify-between p-3 transition-all group cursor-pointer"
+                    style={{
+                      borderRadius: parcGlass.radius.lg,
+                      background: isHighlighted ? 'hsla(245, 90%, 65%, 0.15)' : 'transparent',
+                      border: isHighlighted ? parcGlass.borders.accent : 'none',
+                      boxShadow: isHighlighted ? parcGlass.shadows.bloom.indigo : 'none',
+                    }}
                     data-testid={`nil-deal-${i}`}
                   >
                       <div className="flex items-center gap-3">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
-                            isHighlighted 
-                              ? 'bg-gradient-to-tr from-indigo-600 to-purple-600' 
-                              : 'bg-gradient-to-tr from-gray-700 to-gray-600'
-                          }`}>
+                          <div 
+                            className="flex items-center justify-center"
+                            style={{
+                              width: '32px',
+                              height: '32px',
+                              borderRadius: parcGlass.radius.full,
+                              fontSize: parcGlass.typography.fontSize.xs,
+                              fontWeight: 700,
+                              background: isHighlighted 
+                                ? 'linear-gradient(to top right, hsla(250, 72%, 48%, 1), hsla(252, 68%, 40%, 1))'
+                                : 'linear-gradient(to top right, hsla(0, 0%, 40%, 1), hsla(0, 0%, 35%, 1))',
+                            }}
+                          >
                               {deal.brand[0]}
                           </div>
                           <div>
-                              <div className="text-sm font-medium">{deal.brand}</div>
-                              <div className="text-xs text-white/40">
+                              <div style={{ fontSize: parcGlass.typography.fontSize.sm, fontWeight: 500 }}>
+                                {deal.brand}
+                              </div>
+                              <div style={{ fontSize: parcGlass.typography.fontSize.xs, color: 'hsla(0, 0%, 100%, 0.4)' }}>
                                 {highlightedTeam ? deal.athlete : deal.type}
                               </div>
                           </div>
                       </div>
                       <div className="text-right">
-                          <div className="text-sm font-mono">{deal.value}</div>
-                          <div className={`text-[10px] px-1.5 py-0.5 rounded-full inline-block mt-1 ${
-                              deal.status === 'Signed' || deal.status === 'Active' ? 'bg-green-500/20 text-green-300' : 
-                              deal.status === 'Negotiating' ? 'bg-yellow-500/20 text-yellow-300' : 'bg-white/10 text-white/50'
-                          }`}>
+                          <div style={{ fontSize: parcGlass.typography.fontSize.sm, fontFamily: parcGlass.typography.fontFamily.mono }}>
+                            {deal.value}
+                          </div>
+                          <div 
+                            style={{
+                              fontSize: '10px',
+                              paddingLeft: '6px',
+                              paddingRight: '6px',
+                              paddingTop: '2px',
+                              paddingBottom: '2px',
+                              borderRadius: parcGlass.radius.full,
+                              display: 'inline-block',
+                              marginTop: '4px',
+                              background: deal.status === 'Signed' || deal.status === 'Active' 
+                                ? 'hsla(142, 76%, 50%, 0.15)' 
+                                : deal.status === 'Negotiating' 
+                                ? 'hsla(45, 93%, 58%, 0.15)' 
+                                : 'hsla(0, 0%, 100%, 0.08)',
+                              color: deal.status === 'Signed' || deal.status === 'Active' 
+                                ? parcGlass.colors.accent.success
+                                : deal.status === 'Negotiating' 
+                                ? parcGlass.colors.accent.warning
+                                : 'hsla(0, 0%, 100%, 0.5)',
+                            }}
+                          >
                               {deal.status}
                           </div>
                       </div>
