@@ -1,0 +1,121 @@
+project: parcRI_ecosystem_v1
+version: 1.0
+
+branding:
+  company_name: PARC
+  engine_name: parcRI        # case-sensitive, do not alter
+  os_name: HyperBar OS
+  tagline: "The world's first state-based cognitive OS."
+  powered_by: "Powered by parcRI"
+
+domains:
+  root: parcri.net
+
+  subdomains:
+    station:                  # OS / primary interface
+      url: station.parcri.net
+      target: parcmains.replit.app
+      purpose: "HyperBar OS — main workspace"
+      status: active
+
+    mynil:                    # NIL app
+      url: mynil.parcri.net
+      target: my-nil-jkhv99cmyb.replit.app
+      purpose: "Spotlight NIL — athlete monetization"
+      status: active
+
+    creator:
+      url: creator.parcri.net
+      target: parcmains.replit.app   # placeholder until CreatorFlow is deployed
+      purpose: "CreatorFlow — creator tools suite"
+      status: reserved
+
+    board:
+      url: board.parcri.net
+      target: parcmains.replit.app   # placeholder
+      purpose: "parcBoard — admin + analytics"
+      status: reserved
+
+    id:
+      url: id.parcri.net
+      target: parcmains.replit.app   # placeholder
+      purpose: "Authentication + user accounts"
+      status: reserved
+
+    api:
+      url: api.parcri.net
+      target: parcmains.replit.app   # placeholder
+      purpose: "parcRI engine API"
+      status: reserved
+
+routing:
+  root_route:
+    path: "/"
+    component: "Landing"
+    description: "Landing page for PARC Real Intelligence"
+
+  os_route:
+    path: "/app"
+    component: "HyperBar"
+    description: "Main OS interface"
+
+  nil_route:
+    path: "/nil"
+    redirect: "https://mynil.parcri.net"
+
+  creator_route:
+    path: "/creator"
+    redirect: "https://creator.parcri.net"
+
+  board_route:
+    path: "/board"
+    redirect: "https://board.parcri.net"
+
+deployment:
+  hosting: Replit
+  landing_app: parcmains.replit.app
+  os_app: parcmains.replit.app
+  nil_app: my-nil-jkhv99cmyb.replit.app
+
+stripe:
+  early_access:
+    product_name: "PARCOS Early Access Pass"
+    price: 0.99
+    currency: USD
+    link_placeholder: "https://buy.stripe.com/REPLACE_ME"
+    notes: "Replace with generated Stripe payment link."
+
+features:
+  early_access_enabled: true
+  multiapp_ecosystem: true
+  unified_engine: parcRI
+
+ecosystem_map:
+  - name: "HyperBar OS"
+    domain: station.parcri.net
+    engine: parcRI
+    role: "Primary user environment"
+
+  - name: "Spotlight NIL"
+    domain: mynil.parcri.net
+    engine: parcRI
+    role: "Athlete monetization + sharing"
+
+  - name: "CreatorFlow"
+    domain: creator.parcri.net
+    engine: parcRI
+    role: "Creators, content, ads"
+
+  - name: "parcBoard"
+    domain: board.parcri.net
+    engine: parcRI
+    role: "Admin, analytics, dashboards"
+
+  - name: "parcRI Engine"
+    domain: api.parcri.net
+    role: "Meaning engine, vector system"
+
+notes:
+  - "All apps share a unified identity: Powered by parcRI."
+  - "Subdomains reserved for future expansion should keep proxy ON."
+  - "This file should be stored in the root of the workspace for all future agents."
