@@ -78,21 +78,35 @@ export function Pricing() {
           color: #555;
         }
 
-        .pricing-nav-links {
+        .pricing-nav-right {
           display: flex;
           gap: 30px;
           align-items: center;
         }
 
-        .pricing-nav-links a {
+        .pricing-nav-link {
           color: #666;
           text-decoration: none;
           font-size: 1rem;
           transition: 0.2s ease;
         }
 
-        .pricing-nav-links a:hover {
+        .pricing-nav-link:hover {
           color: #111;
+        }
+
+        .pricing-nav-cta {
+          color: #fff;
+          background: #111;
+          text-decoration: none;
+          font-size: 0.95rem;
+          padding: 10px 20px;
+          border-radius: 8px;
+          transition: 0.2s ease;
+        }
+
+        .pricing-nav-cta:hover {
+          background: #333;
         }
 
         .pricing-title {
@@ -210,14 +224,14 @@ export function Pricing() {
           flex-wrap: wrap;
         }
 
-        .pricing-footer-links a {
+        .pricing-footer-link {
           color: #666;
           text-decoration: none;
           font-size: 0.9rem;
           transition: 0.2s ease;
         }
 
-        .pricing-footer-links a:hover {
+        .pricing-footer-link:hover {
           color: #111;
         }
 
@@ -228,7 +242,7 @@ export function Pricing() {
             gap: 16px;
           }
 
-          .pricing-nav-links {
+          .pricing-nav-right {
             gap: 16px;
           }
 
@@ -261,14 +275,20 @@ export function Pricing() {
         <Link href="/" className="pricing-nav-logo" data-testid="link-logo">
           PARC
         </Link>
-        <div className="pricing-nav-links">
-          <Link href="/" className="pricing-nav-links" data-testid="link-home">
+        <div className="pricing-nav-right">
+          <Link href="/" className="pricing-nav-link" data-testid="link-home">
             Home
           </Link>
-          <a href="/app" className="pricing-nav-links" data-testid="link-app">
+          <Link href="/app" className="pricing-nav-link" data-testid="link-app">
             App
-          </a>
-          <a href="https://buy.stripe.com/test_4gM00j98qdLw5mA6bD9ws00" target="_blank" rel="noopener noreferrer" data-testid="link-early-access-nav">
+          </Link>
+          <a 
+            href={(stripeConfig as any).early_access?.paymentLinkUrl || '#'} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="pricing-nav-cta"
+            data-testid="link-early-access-nav"
+          >
             Get Started
           </a>
         </div>
@@ -314,18 +334,18 @@ export function Pricing() {
           All plans include free tier capabilities. Need a custom solution? Contact us for enterprise pricing.
         </p>
         <div className="pricing-footer-links">
-          <a href="https://mynil.parcri.net" target="_blank" rel="noopener noreferrer" data-testid="link-footer-mynil">
+          <Link href="/nil" className="pricing-footer-link" data-testid="link-footer-mynil">
             myNIL
-          </a>
-          <a href="https://station.parcri.net/app" target="_blank" rel="noopener noreferrer" data-testid="link-footer-parcstation">
+          </Link>
+          <Link href="/app" className="pricing-footer-link" data-testid="link-footer-parcstation">
             parcStation
-          </a>
-          <a href="https://board.parcri.net" target="_blank" rel="noopener noreferrer" data-testid="link-footer-parcboard">
+          </Link>
+          <Link href="/board" className="pricing-footer-link" data-testid="link-footer-parcboard">
             parcBoard
-          </a>
-          <a href="https://creator.parcri.net" target="_blank" rel="noopener noreferrer" data-testid="link-footer-creatorflow">
+          </Link>
+          <Link href="/creator" className="pricing-footer-link" data-testid="link-footer-creatorflow">
             CreatorFlow
-          </a>
+          </Link>
         </div>
       </div>
     </div>

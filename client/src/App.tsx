@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
-import { Router, Route } from 'wouter';
+import { Router, Route, Switch, Redirect } from 'wouter';
 import { Landing } from '@/pages/Landing';
 import { Pricing } from '@/pages/Pricing';
 import { Dock } from '@/components/Dock';
 import { Canvas } from '@/components/Canvas';
+import { SystemBar } from '@/components/SystemBar';
 import { BillOverlay } from '@/components/BillOverlay';
 import { BillPresence } from '@/components/BillPresence';
 import { SpatialHUD } from '@/components/SpatialHUD';
@@ -12,6 +13,7 @@ import { SpatialShell } from '@/spatial';
 import { initializeState, useParcOSStore } from '@/state/store';
 import { Toaster } from "@/components/ui/toaster";
 import { highlightEngine } from '@/services/highlight-engine';
+import NotFound from '@/pages/not-found';
 
 function ParcOSApp() {
   useEffect(() => {
@@ -75,6 +77,7 @@ function ParcOSApp() {
     <div className="w-full h-screen text-white overflow-visible font-sans selection:bg-indigo-500/30">
       <SpatialShell />
       <AnimatedBackground />
+      <SystemBar />
       <Canvas />
       <SpatialHUD />
       <Dock />
@@ -85,12 +88,79 @@ function ParcOSApp() {
   );
 }
 
+function ParcBarRedirect() {
+  useEffect(() => {
+    const store = useParcOSStore.getState();
+    initializeState();
+    
+    setTimeout(() => {
+      const dockItems = [
+        { id: 'parcbar', app: 'parcbar-sports', workspace: 'PARCBAR', stack: 'parcbar', label: 'parcBar' }
+      ];
+      const item = dockItems[0];
+      store.setActiveWorkspace(item.workspace, item.stack);
+    }, 100);
+  }, []);
+  
+  return <ParcOSApp />;
+}
+
+function NILRedirect() {
+  useEffect(() => {
+    const store = useParcOSStore.getState();
+    initializeState();
+    
+    setTimeout(() => {
+      store.setActiveWorkspace('NIL', 'nil');
+    }, 100);
+  }, []);
+  
+  return <ParcOSApp />;
+}
+
+function CreatorRedirect() {
+  useEffect(() => {
+    const store = useParcOSStore.getState();
+    initializeState();
+    
+    setTimeout(() => {
+      store.setActiveWorkspace('CREATOR', 'creator');
+    }, 100);
+  }, []);
+  
+  return <ParcOSApp />;
+}
+
+function BoardRedirect() {
+  useEffect(() => {
+    const store = useParcOSStore.getState();
+    initializeState();
+    
+    setTimeout(() => {
+      store.setActiveWorkspace('BOARD', 'board');
+    }, 100);
+  }, []);
+  
+  return <ParcOSApp />;
+}
+
 function App() {
   return (
     <Router>
-      <Route path="/" component={Landing} />
-      <Route path="/pricing" component={Pricing} />
-      <Route path="/app" component={ParcOSApp} />
+      <Switch>
+        <Route path="/" component={Landing} />
+        <Route path="/pricing" component={Pricing} />
+        <Route path="/app" component={ParcOSApp} />
+        <Route path="/station" component={ParcOSApp} />
+        <Route path="/parcbar" component={ParcBarRedirect} />
+        <Route path="/nil" component={NILRedirect} />
+        <Route path="/creator" component={CreatorRedirect} />
+        <Route path="/board" component={BoardRedirect} />
+        <Route path="/id">
+          {() => <Redirect to="/app" />}
+        </Route>
+        <Route component={NotFound} />
+      </Switch>
     </Router>
   );
 }

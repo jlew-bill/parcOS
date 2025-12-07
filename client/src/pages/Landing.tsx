@@ -1,7 +1,10 @@
 import React from 'react';
 import { Link } from 'wouter';
+import stripeConfig from '../../../config/stripe.auto.json';
 
 export function Landing() {
+  const earlyAccessLink = (stripeConfig as any).early_access?.paymentLinkUrl || 'https://buy.stripe.com/test_placeholder';
+
   return (
     <div className="w-full flex flex-col items-center bg-[#f7f7f7]">
       <style>{`
@@ -47,9 +50,13 @@ export function Landing() {
 
         .landing-cta {
           margin-top: 35px;
+          display: flex;
+          gap: 12px;
+          justify-content: center;
+          flex-wrap: wrap;
         }
 
-        .landing-cta a {
+        .landing-cta-button {
           text-decoration: none;
           display: inline-block;
           background: #111;
@@ -59,24 +66,34 @@ export function Landing() {
           font-size: 1.05rem;
           font-weight: 600;
           transition: 0.2s ease;
-          margin-right: 12px;
         }
 
-        .landing-cta a:hover {
+        .landing-cta-button:hover {
           background: #333;
           transform: translateY(-2px);
+        }
+
+        .landing-cta-button-secondary {
+          background: #333;
         }
 
         .landing-links {
           margin-top: 28px;
           font-size: 0.95rem;
           color: #444;
+          display: flex;
+          gap: 20px;
+          justify-content: center;
+          flex-wrap: wrap;
         }
 
         .landing-links a {
           color: #444;
           text-decoration: underline;
-          margin: 0 10px;
+        }
+
+        .landing-links a:hover {
+          color: #111;
         }
 
         .preview-strip-section {
@@ -230,20 +247,30 @@ export function Landing() {
           </div>
 
           <div className="landing-cta">
-            <a href="https://buy.stripe.com/test_placeholder" target="_blank" data-testid="cta-early-access">
+            <a 
+              href={earlyAccessLink} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="landing-cta-button"
+              data-testid="cta-early-access"
+            >
               Get Early Access — $0.99
             </a>
-            <a href="https://station.parcri.net/app" target="_blank" data-testid="button-enter-app" style={{ background: '#333' }}>
+            <Link 
+              href="/app"
+              className="landing-cta-button landing-cta-button-secondary"
+              data-testid="button-enter-app"
+            >
               Enter App
-            </a>
+            </Link>
           </div>
 
           <div className="landing-links">
-            <a href="/pricing" data-testid="link-pricing">Pricing</a>
-            <a href="https://mynil.parcri.net" target="_blank" data-testid="link-mynil">myNIL</a>
-            <a href="https://station.parcri.net/app" target="_blank" data-testid="link-parcstation">parcStation</a>
-            <a href="https://board.parcri.net" target="_blank" data-testid="link-parcboard">parcBoard</a>
-            <a href="https://creator.parcri.net" target="_blank" data-testid="link-creatorflow">CreatorFlow</a>
+            <Link href="/pricing" data-testid="link-pricing">Pricing</Link>
+            <Link href="/nil" data-testid="link-mynil">myNIL</Link>
+            <Link href="/app" data-testid="link-parcstation">parcStation</Link>
+            <Link href="/board" data-testid="link-parcboard">parcBoard</Link>
+            <Link href="/creator" data-testid="link-creatorflow">CreatorFlow</Link>
           </div>
         </div>
       </div>
@@ -259,6 +286,9 @@ export function Landing() {
               alt="HyperBar OS Preview" 
               className="preview-strip-image"
               data-testid="preview-hyperbar-image"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
             />
           </div>
           
@@ -303,9 +333,9 @@ export function Landing() {
           </div>
 
           <div className="preview-cta">
-            <a href="https://station.parcri.net/app" target="_blank" data-testid="button-explore-full">
+            <Link href="/app" data-testid="button-explore-full">
               Explore Full Interface →
-            </a>
+            </Link>
           </div>
         </div>
       </div>
