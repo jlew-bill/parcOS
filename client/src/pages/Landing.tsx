@@ -239,6 +239,7 @@ export function Landing() {
           </div>
 
           <div className="landing-links">
+            <a href="/pricing" data-testid="link-pricing">Pricing</a>
             <a href="https://mynil.parcri.net" target="_blank" data-testid="link-mynil">myNIL</a>
             <a href="https://station.parcri.net/app" target="_blank" data-testid="link-parcstation">parcStation</a>
             <a href="https://board.parcri.net" target="_blank" data-testid="link-parcboard">parcBoard</a>

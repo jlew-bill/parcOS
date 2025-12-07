@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Router, Route } from 'wouter';
 import { Landing } from '@/pages/Landing';
+import { Pricing } from '@/pages/Pricing';
 import { Dock } from '@/components/Dock';
 import { Canvas } from '@/components/Canvas';
 import { BillOverlay } from '@/components/BillOverlay';
@@ -88,6 +89,7 @@ function App() {
   return (
     <Router>
       <Route path="/" component={Landing} />
+      <Route path="/pricing" component={Pricing} />
       <Route path="/app" component={ParcOSApp} />
     </Router>
   );
