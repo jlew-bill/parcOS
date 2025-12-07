@@ -1,0 +1,89 @@
+BILL, enter TRUE FINALIZER MODE.
+
+In addition to finishing parcOS v1, you must also prepare the system for
+integration of the ParcTalk programming language.
+
+This requires:
+
+====================
+1. Finalize parcOS v1
+====================
+As before:
+- Finish the spatial environment
+- Harden the engine (App Registry, Data Workers, BILL Commands)
+- Finalize UI and animation smoothness
+- Make the OS responsive and stable
+- Add authentication + subscription gating
+- Ensure SPORTS and NIL apps follow consistent architecture
+- Create the Programming Guide
+
+==============================
+2. Prepare the ParcTalk runtime
+==============================
+You must establish the foundations for the ParcTalk language:
+
+A. Language Interface Files
+- Create /language directory with:
+  - core.ts
+  - interpreter.ts
+  - runtime.ts
+  - shapes.ts (CMFK bindings)
+  - bill-api.ts (BILL shell bindings)
+  - ui-api.ts (cards, windows, spatial scene control)
+
+B. Syntax and Behavior
+- Define a minimal syntax:
+    card "Sports" {
+        open();
+        animate pulse;
+    }
+- Commands map to BILL actions and App Registry operations.
+
+C. Interpreter Integration
+- ParcTalk interpreter must be callable from BILL.
+- BILL must evaluate ParcTalk scripts within the OS context.
+- Scripts can manipulate windows, data workers, CMFK vectors, and spatial objects.
+
+D. Bindings to CMFK
+- Commands like:
+    fog.collapse();
+    meaning.flow("sports.live");
+  must map to CMFK vector operations.
+
+E. Bindings to OS Shell
+- ParcTalk should support:
+    open.card("Sports");
+    set.spatial("on");
+    window("NIL").move(x:20, y:50);
+    dock.highlight("sports");
+
+F. Safe Execution
+- Interpreter must sandbox scripts.
+- No destructive operations by default.
+
+=======================================
+3. Update the Programming Guide (1==1)
+=======================================
+Document:
+- ParcTalk syntax
+- how to build apps with it
+- how it interacts with OS
+- how BILL executes it
+- how CMFK integrates
+
+=====================================
+4. Perform the 1==1 Consistency Sweep
+=====================================
+Ensure:
+- Docs match code
+- Code matches runtime
+- Runtime matches intended behaviors
+
+=====================================
+5. Deliver a final transformation summary
+=====================================
+
+Loop through planning → checking → editing → testing
+until parcOS + ParcTalk is fully aligned and stable.
+
+Begin TRUE FINALIZER MODE now.
