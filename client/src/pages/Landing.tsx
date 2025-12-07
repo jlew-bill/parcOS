@@ -89,18 +89,19 @@ export function Landing() {
         </div>
 
         <div className="landing-cta">
-          <a href="#" target="_blank" data-testid="button-early-access">
+          <a href="https://buy.stripe.com/test_placeholder" target="_blank" data-testid="cta-early-access">
             Get Early Access — $0.99
           </a>
-          <a href="/app" data-testid="button-enter-app" style={{ background: '#333' }}>
+          <a href="https://station.parcri.net/app" target="_blank" data-testid="button-enter-app" style={{ background: '#333' }}>
             Enter App
           </a>
         </div>
 
         <div className="landing-links">
-          <a href="https://mynil.parcri.net" data-testid="link-mynil">myNIL</a>
-          <a href="#" data-testid="link-parcstation">parcStation (coming)</a>
-          <a href="#" data-testid="link-parcboard">parcBoard</a>
+          <a href="https://mynil.parcri.net" target="_blank" data-testid="link-mynil">myNIL</a>
+          <a href="https://station.parcri.net/app" target="_blank" data-testid="link-parcstation">parcStation</a>
+          <a href="https://board.parcri.net" target="_blank" data-testid="link-parcboard">parcBoard</a>
+          <a href="https://creator.parcri.net" target="_blank" data-testid="link-creatorflow">CreatorFlow</a>
         </div>
       </div>
     </div>
