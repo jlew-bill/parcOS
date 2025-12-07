@@ -147,8 +147,23 @@ export const Dock: React.FC = () => {
       whileHover={isInCinemaMode ? { opacity: 0.6, scale: 1 } : undefined}
       data-testid="dock-container"
     >
+      {/* Reflection Effect */}
       <motion.div 
-        className="flex items-end gap-2 px-4 py-2.5"
+        className="absolute -bottom-12 left-1/2 -translate-x-1/2 w-[280px] h-16 pointer-events-none"
+        style={{
+          background: parcGlass.colors.gradients.dockReflection,
+          borderRadius: parcGlass.radius.pill,
+          filter: 'blur(8px) brightness(0.3)',
+          transform: 'scaleY(-1)',
+        }}
+        animate={{
+          opacity: isInCinemaMode ? 0 : (dockVisible ? 0.4 : 0.2),
+        }}
+        transition={{ duration: 0.3 }}
+      />
+
+      <motion.div 
+        className="flex items-end gap-2 px-4 py-2.5 relative"
         style={{
           ...glassStyles.dock,
           borderRadius: parcGlass.radius.pill,
@@ -226,33 +241,69 @@ interface DockItemProps {
 }
 
 const DockItem: React.FC<DockItemProps> = ({ icon: Icon, label, onClick, 'data-testid': testId }) => {
+  const [isHovering, setIsHovering] = useState(false);
+
   return (
-    <motion.button
-      whileHover={parcGlass.motion.variants.hoverLift}
-      whileTap={parcGlass.motion.variants.tapPress}
-      onClick={onClick}
-      className="group relative flex flex-col items-center justify-center w-12 h-12 transition-all duration-200"
-      style={{
-        background: parcGlass.colors.mistGlass.light,
-        borderRadius: parcGlass.radius.dockIcon,
-        border: parcGlass.borders.thin,
-        boxShadow: parcGlass.shadows.dockIcon.idle,
-      }}
-      data-testid={testId}
-    >
-      <Icon className="w-6 h-6 text-white/80 group-hover:text-white drop-shadow-md" />
-      <span 
-        className="absolute -bottom-9 px-3 py-1.5 text-[10px] font-medium text-white opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none"
+    <motion.div className="relative">
+      {/* Bloom effect on hover */}
+      <motion.div
+        className="absolute -inset-2 rounded-full opacity-0 group-hover:opacity-100 pointer-events-none"
         style={{
-          background: parcGlass.colors.cosmicNight[800],
-          borderRadius: parcGlass.radius.sm,
-          border: parcGlass.borders.thin,
-          backdropFilter: parcGlass.blur.md,
+          background: parcGlass.colors.gradients.indigoGlow,
+          filter: 'blur(12px)',
         }}
+        animate={{
+          opacity: isHovering ? 0.6 : 0,
+        }}
+        transition={{ duration: 0.2 }}
+      />
+
+      <motion.button
+        whileHover={{
+          ...parcGlass.motion.variants.hoverLift,
+          boxShadow: parcGlass.shadows.dockIcon.active,
+        }}
+        whileTap={parcGlass.motion.variants.tapPress}
+        onClick={onClick}
+        className="group relative flex flex-col items-center justify-center w-12 h-12 transition-all duration-200 z-10"
+        style={{
+          background: parcGlass.colors.mistGlass.light,
+          borderRadius: parcGlass.radius.dockIcon,
+          border: parcGlass.borders.thin,
+          boxShadow: parcGlass.shadows.dockIcon.idle,
+        }}
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
+        data-testid={testId}
       >
-        {label}
-      </span>
-      <div className="absolute -bottom-2 w-1 h-1 rounded-full bg-white/30 group-hover:bg-white/80 opacity-0 group-hover:opacity-100 transition-all" />
-    </motion.button>
+        <Icon className="w-6 h-6 text-white/80 group-hover:text-white drop-shadow-md transition-colors" />
+        <motion.span 
+          className="absolute -bottom-9 px-3 py-1.5 text-[10px] font-medium text-white whitespace-nowrap pointer-events-none"
+          style={{
+            background: parcGlass.colors.cosmicNight[800],
+            borderRadius: parcGlass.radius.sm,
+            border: parcGlass.borders.thin,
+            backdropFilter: parcGlass.blur.md,
+          }}
+          animate={{
+            opacity: isHovering ? 1 : 0,
+            y: isHovering ? -4 : 0,
+          }}
+          transition={{ duration: 0.15 }}
+        >
+          {label}
+        </motion.span>
+        <motion.div 
+          className="absolute -bottom-2 w-1 h-1 rounded-full bg-white/30"
+          animate={{
+            backgroundColor: isHovering ? parcGlass.colors.electricIndigo[500] : 'rgba(255, 255, 255, 0.3)',
+            boxShadow: isHovering ? `0 0 8px ${parcGlass.colors.electricIndigo[500]}` : 'none',
+            opacity: isHovering ? 1 : 0,
+            scale: isHovering ? 1.5 : 1,
+          }}
+          transition={{ duration: 0.2 }}
+        />
+      </motion.button>
+    </motion.div>
   );
 };
