@@ -1,3 +1,4 @@
+import { ParcBar } from '@/components/parcBar/ParcBar'; // <-- ADD THIS IMPORT AT TOP
 import React, { useEffect } from 'react';
 import { Router, Route, Switch, Redirect } from 'wouter';
 import { Landing } from '@/pages/Landing';
