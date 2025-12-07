@@ -1,33 +1,21 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { useParcBarStore } from "../../stores/useParcBarStore";
-import { useWindowStore } from "../../stores/windowStore";
-import { parseParcTalk } from "../../parcTalk/interpreter";
+
+import { runBill } from "@/bill/runtime";
+import { useParcBarStore } from "@/state/useParcBarStore";
+import { useWindowStore } from "@/state/windowStore";
 
 export const ParcBar = () => {
   const [query, setQuery] = useState("");
   const { apps } = useParcBarStore();
-  const { openWindow, arrangeGrid, arrangeCascade } = useWindowStore();
+  const { openWindow } = useWindowStore();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
 
-    const intent = parseParcTalk(query);
-
-    switch (intent.intent) {
-      case "open_app":
-        openWindow(intent.target);
-        break;
-
-      case "arrange_windows":
-        if (intent.layout === "grid") arrangeGrid();
-        if (intent.layout === "cascade") arrangeCascade();
-        break;
-
-      default:
-        console.warn("Unknown intent:", intent);
-    }
+    // BILL²: full OS intelligence pipeline
+    await runBill(query);
 
     setQuery("");
   };
@@ -64,7 +52,7 @@ export const ParcBar = () => {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Ask BILL • Try 'open classroom' or 'arrange grid'"
+          placeholder="Ask BILL • Try 'open classroom' or 'grid layout'"
           className="w-full px-4 py-2 rounded-xl 
                      bg-white/10 text-white placeholder-white/40 
                      focus:outline-none focus:ring-2 focus:ring-purple-400"
@@ -74,21 +62,21 @@ export const ParcBar = () => {
       {/* Quick Actions */}
       <div className="flex justify-center gap-4 mt-1">
         <button
-          onClick={() => arrangeGrid()}
+          onClick={() => runBill("arrange grid")}
           className="px-3 py-1 text-xs bg-white/10 text-white rounded-lg hover:bg-white/20"
         >
           Grid
         </button>
 
         <button
-          onClick={() => arrangeCascade()}
+          onClick={() => runBill("arrange cascade")}
           className="px-3 py-1 text-xs bg-white/10 text-white rounded-lg hover:bg-white/20"
         >
           Cascade
         </button>
 
         <button
-          onClick={() => openWindow("sports")}
+          onClick={() => runBill("open sports")}
           className="px-3 py-1 text-xs bg-white/10 text-white rounded-lg hover:bg-white/20"
         >
           SportsBar
