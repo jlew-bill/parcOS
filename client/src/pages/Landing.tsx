@@ -79,6 +79,60 @@ export function Landing() {
           margin: 0 10px;
         }
 
+        .preview-strip-section {
+          width: 100%;
+          padding: 64px 20px 48px 20px;
+          background: #f7f7f7;
+        }
+
+        @media (max-width: 640px) {
+          .preview-strip-section {
+            padding: 32px 20px 32px 20px;
+          }
+        }
+
+        .preview-strip-container {
+          max-width: 900px;
+          margin: 0 auto;
+          text-align: center;
+        }
+
+        .preview-strip-title {
+          font-size: 2rem;
+          font-weight: 700;
+          margin-bottom: 8px;
+          color: #111;
+        }
+
+        .preview-strip-subtext {
+          font-size: 1.125rem;
+          color: #666;
+          margin-bottom: 32px;
+          font-weight: 400;
+        }
+
+        .preview-strip-frame {
+          background: #f8f8f8cc;
+          border-radius: 18px;
+          padding: 8px;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+          margin-bottom: 20px;
+        }
+
+        .preview-strip-image {
+          width: 100%;
+          height: auto;
+          border-radius: 12px;
+          display: block;
+        }
+
+        .preview-strip-note {
+          font-size: 0.9rem;
+          color: #999;
+          margin-top: 16px;
+          font-weight: 400;
+        }
+
         .preview-section {
           width: 100%;
           padding: 60px 20px;
@@ -192,6 +246,24 @@ export function Landing() {
           </div>
         </div>
       </div>
+
+      <section className="preview-strip-section">
+        <div className="preview-strip-container">
+          <h2 className="preview-strip-title">A new kind of operating system.</h2>
+          <p className="preview-strip-subtext">Built on meaning. Powered by parcRI.</p>
+          
+          <div className="preview-strip-frame">
+            <img 
+              src="/preview/hyperbar.png" 
+              alt="HyperBar OS Preview" 
+              className="preview-strip-image"
+              data-testid="preview-hyperbar-image"
+            />
+          </div>
+          
+          <p className="preview-strip-note">This is an early preview. Your experience will update automatically.</p>
+        </div>
+      </section>
 
       <div className="preview-section">
         <div className="preview-container">

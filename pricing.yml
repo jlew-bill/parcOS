@@ -1,0 +1,130 @@
+pricing:
+  version: 1.0
+  currency: USD
+
+  tiers:
+
+    free:
+      name: "Free"
+      price: 0
+      billing_cycle: none
+      description: "Entry tier for viral growth."
+      includes:
+        - "Basic access to HyperBar OS"
+        - "View Spotlight NIL athlete profiles"
+        - "Basic creator tools (limited)"
+        - "Can share links and receive viewer traffic"
+        - "Limited cloud state storage"
+        - "Powered by parcRI"
+      limits:
+        os:
+          windows: 2
+          storage_mb: 50
+        creator:
+          exports_per_month: 5
+        nil:
+          profile_views: unlimited
+        api:
+          requests_per_day: 20
+
+    early_access:
+      name: "Early Access Pass"
+      price: 0.99
+      billing_cycle: one_time
+      description: "Unlock early OS features + priority access."
+      includes:
+        - "Unlock new HyperBar modules early"
+        - "Beta access to CreatorFlow"
+        - "Upgraded NIL templates"
+        - "Future upgrades at no extra cost"
+        - "Support PARC development"
+      limits:
+        os:
+          windows: 4
+        api:
+          requests_per_day: 50
+
+    athlete_pro:
+      name: "Athlete Pro"
+      price: 4.99
+      billing_cycle: monthly
+      description: "Advanced NIL toolkit for student-athletes."
+      includes:
+        - "Enhanced Spotlight NIL profile"
+        - "Auto-generated media kit"
+        - "AI-based brand matching"
+        - "Link-in-bio tools"
+        - "Detailed analytics + reach insights"
+        - "Priority OS window management"
+        - "Expanded cloud state storage"
+      limits:
+        os:
+          windows: 6
+          storage_mb: 500
+        creator:
+          exports_per_month: 20
+        api:
+          requests_per_day: 200
+
+    creator_pro:
+      name: "CreatorFlow Pro"
+      price: 9.99
+      billing_cycle: monthly
+      description: "Full creator suite powered by parcRI."
+      includes:
+        - "Advanced editing templates"
+        - "Auto-caption generator"
+        - "AI story & script suggestions"
+        - "OS workspace expansion"
+        - "Custom branding tools"
+        - "Performance analytics dashboard"
+      limits:
+        creator:
+          exports_per_month: 100
+        os:
+          windows: 8
+        api:
+          requests_per_day: 500
+
+    team_suite:
+      name: "Coach / Team Suite"
+      price: 29
+      billing_cycle: monthly
+      description: "Tools for coaching staffs, teams, and programs."
+      includes:
+        - "Roster tools"
+        - "Athlete performance dashboards"
+        - "Private team workspace in HyperBar"
+        - "Team NIL marketplace access"
+        - "Unlimited athlete profiles"
+      limits:
+        api:
+          requests_per_day: 2000
+        os:
+          windows: unlimited
+
+    district_suite:
+      name: "District Suite"
+      price: 299
+      billing_cycle: monthly
+      description: "Premium, scalable tools for school districts."
+      includes:
+        - "Full access to parcBoard Admin"
+        - "District-wide NIL tools for all athletes"
+        - "Centralized analytics"
+        - "Unlimited HyperBar seats"
+        - "Priority support"
+        - "API access for SIS integration"
+        - "Bulk user management"
+      limits:
+        api:
+          requests_per_day: unlimited
+        os:
+          windows: unlimited
+          storage_mb: unlimited
+
+notes:
+  - "All tiers inherit Free tier capabilities."
+  - "parcRI engine limits prevent abuse."
+  - "Team and District plans are where institutional revenue originates."
+  - "Early Access Pass can be upgraded later with perks."

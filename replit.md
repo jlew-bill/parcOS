@@ -58,6 +58,26 @@ Preferred communication style: Simple, everyday language.
 - Language: ParcTalk (custom DSL for the system)
 - AI Integration: BILL AI assistant
 
+## Landing Page Structure
+
+**Hero Section:**
+- Badge: "NEW • PARCOS v1"
+- Headline: "PARC Real Intelligence"
+- Tagline: "The world's first state-based cognitive OS..."
+- Primary CTA: "Enter App" → station.parcri.net/app
+- Secondary CTA: "Get Early Access — $0.99" → Stripe payment link
+- Footer links: myNIL, parcStation, parcBoard, CreatorFlow
+
+**Preview Strip Section:**
+- Headline: "A new kind of operating system."
+- Subtext: "Built on meaning. Powered by parcRI."
+- Preview frame with HyperBar OS image (/preview/hyperbar.png)
+- Note: "This is an early preview. Your experience will update automatically."
+
+**Feature Gallery Section:**
+- 6 preview cards with feature labels
+- "Explore Full Interface" CTA
+
 ## Branding & Identity
 
 - All applications share: "Powered by parcRI"
@@ -67,19 +87,32 @@ Preferred communication style: Simple, everyday language.
 
 ## Monetization
 
-**Early Access Pass:**
-- Product: PARCOS Early Access Pass
-- Price: $0.99 USD
-- Status: Enabled
-- Stripe Link: To be configured (placeholder: https://buy.stripe.com/REPLACE_ME)
+**Pricing Structure** (see pricing.yml for full details):
+
+| Tier | Price | Billing | Use Case |
+|------|-------|---------|----------|
+| Free | $0 | - | Entry-level users |
+| Early Access Pass | $0.99 | One-time | Early adopters |
+| Athlete Pro | $4.99/mo | Monthly | Student-athletes |
+| CreatorFlow Pro | $9.99/mo | Monthly | Content creators |
+| Coach/Team Suite | $29/mo | Monthly | Teams & coaches |
+| District Suite | $299/mo | Monthly | School districts |
+
+**Primary Revenue Drivers:**
+- Team Suite ($29/mo) - Coaching staffs
+- District Suite ($299/mo) - School districts
+- Athlete Pro ($4.99/mo) - Student-athletes
+- CreatorFlow Pro ($9.99/mo) - Content creators
 
 ## Key Files
 
 - `parcRI-ecosystem.yml` - Ecosystem configuration and domain mapping
+- `pricing.yml` - Complete pricing structure and tier details
 - `replit.md` - This file (project documentation)
 - `/client/src/pages/Landing.tsx` - Landing page component
 - `/client/src/App.tsx` - Main app routing
 - `/client/index.html` - HTML template with meta tags
+- `/public/preview/hyperbar.png` - Preview image placeholder
 
 ## Next Steps
 
@@ -87,3 +120,4 @@ Preferred communication style: Simple, everyday language.
 2. Set up subdomain routing at parcri.net DNS level
 3. Deploy applications to respective subdomains
 4. Configure authentication system across ecosystem
+5. Implement pricing/subscription tier gating
