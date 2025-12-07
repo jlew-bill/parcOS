@@ -58,7 +58,7 @@ export interface ParcMessage {
   timestamp: string;
 }
 
-export type SnapZoneType = 'left' | 'right' | 'center' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'left-third' | 'center-third' | 'right-third';
+export type SnapZoneType = 'left' | 'right' | 'center' | 'top' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'left-third' | 'center-third' | 'right-third';
 
 export interface SnapZoneDefinition {
   x: number | string;
@@ -71,6 +71,7 @@ export const SNAP_ZONE_DEFINITIONS: Record<SnapZoneType, SnapZoneDefinition> = {
   'left': { x: 0, y: 48, width: '50%', height: 'calc(100% - 48px)' },
   'right': { x: '50%', y: 48, width: '50%', height: 'calc(100% - 48px)' },
   'center': { x: '15%', y: '15%', width: '70%', height: '70%' },
+  'top': { x: 0, y: 48, width: '100%', height: '35%' },
   'top-left': { x: 0, y: 48, width: '50%', height: 'calc(50% - 24px)' },
   'top-right': { x: '50%', y: 48, width: '50%', height: 'calc(50% - 24px)' },
   'bottom-left': { x: 0, y: 'calc(50% + 24px)', width: '50%', height: 'calc(50% - 24px)' },

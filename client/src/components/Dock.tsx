@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, GraduationCap, LayoutGrid, Settings, DollarSign, FolderGit2, Globe, X } from 'lucide-react';
 import { useParcOSStore } from '@/state/store';
 import { nanoid } from 'nanoid';
@@ -12,6 +12,11 @@ export const Dock: React.FC = () => {
   const cards = useParcOSStore(state => state.cards);
   const setActiveWorkspace = useParcOSStore(state => state.setActiveWorkspace);
   const spawnSportsDefaultCards = useParcOSStore(state => state.spawnSportsDefaultCards);
+  const cinemaCardId = useParcOSStore(state => state.cinemaCardId);
+  const sportsMode = useParcOSStore(state => state.sportsMode);
+  const activeWorkspace = useParcOSStore(state => state.activeWorkspace);
+  
+  const isInCinemaMode = cinemaCardId !== null || (activeWorkspace === 'SPORTS' && sportsMode === 'cinema');
   
   const [expandMinimized, setExpandMinimized] = useState(false);
 
@@ -106,7 +111,17 @@ export const Dock: React.FC = () => {
   };
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
+    <motion.div 
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
+      animate={{ 
+        opacity: isInCinemaMode ? 0.1 : 1,
+        y: isInCinemaMode ? 20 : 0,
+        scale: isInCinemaMode ? 0.95 : 1
+      }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+      whileHover={isInCinemaMode ? { opacity: 0.6, scale: 1 } : undefined}
+      data-testid="dock-container"
+    >
       <motion.div 
         className="flex items-end gap-3 px-4 py-3 rounded-3xl glass-panel border-white/15 bg-black/30 backdrop-blur-2xl shadow-2xl"
         layout
@@ -164,7 +179,7 @@ export const Dock: React.FC = () => {
           </>
         )}
       </motion.div>
-    </div>
+    </motion.div>
   );
 };
 

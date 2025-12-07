@@ -7,6 +7,7 @@ const ZONE_LABELS: Record<SnapZoneType, string> = {
   'left': 'Left Half',
   'right': 'Right Half',
   'center': 'Center Stage',
+  'top': 'Banner (Top)',
   'top-left': 'Top Left',
   'top-right': 'Top Right',
   'bottom-left': 'Bottom Left',
@@ -83,7 +84,7 @@ export const SnapZoneOverlay: React.FC = () => {
   const isDragging = useParcOSStore(s => s.isDragging);
   const activeSnapZone = useParcOSStore(s => s.activeSnapZone);
 
-  const allZones: SnapZoneType[] = ['left', 'right', 'center', 'top-left', 'top-right', 'bottom-left', 'bottom-right'];
+  const allZones: SnapZoneType[] = ['left', 'right', 'center', 'top', 'top-left', 'top-right', 'bottom-left', 'bottom-right'];
 
   return (
     <AnimatePresence>

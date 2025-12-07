@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import { motion, PanInfo } from 'framer-motion';
 import { ParcCard, SnapZoneType } from '@/state/types';
 import { useParcOSStore } from '@/state/store';
@@ -7,7 +7,6 @@ import { NILDashboard } from '@/apps/NILDashboard';
 import { ClassroomBoard } from '@/apps/ClassroomBoard';
 import { GenericBrowserCard } from '@/apps/GenericBrowserCard';
 
-// Lazy import SportsMultiView to avoid circular dependencies
 const SportsMultiView = React.lazy(() => import('@/apps/SportsMultiView').then(m => ({ default: m.SportsMultiView })));
 
 const AppRegistry: Record<string, React.FC<{ payload: any }>> = {
@@ -18,6 +17,9 @@ const AppRegistry: Record<string, React.FC<{ payload: any }>> = {
   'creator-studio': () => <div className="p-8 text-white/50 text-center">Creator Studio Placeholder</div>,
   'system-tools': () => <div className="p-8 text-white/50 text-center">System Tools Placeholder</div>,
 };
+
+const MIN_WIDTH = 280;
+const MIN_HEIGHT = 200;
 
 const SNAP_THRESHOLD = 50;
 
@@ -40,6 +42,11 @@ const detectSnapZone = (
   const isNearBottom = cardBottom > screenHeight - SNAP_THRESHOLD;
   const isNearCenterX = Math.abs(cardCenterX - screenWidth / 2) < 100;
   const isNearCenterY = Math.abs(cardCenterY - screenHeight / 2) < 100;
+  const isWideCard = width > screenWidth * 0.5;
+
+  if (isNearTop && isNearCenterX && isWideCard) {
+    return 'top';
+  }
 
   if (isNearLeftEdge) {
     if (isNearTop) return 'top-left';
@@ -53,6 +60,10 @@ const detectSnapZone = (
     return 'right';
   }
   
+  if (isNearTop && !isNearLeftEdge && !isNearRightEdge) {
+    return 'top';
+  }
+  
   if (isNearCenterX && isNearCenterY) {
     return 'center';
   }
@@ -62,8 +73,10 @@ const detectSnapZone = (
 
 export const ParcCardView: React.FC<{ card: ParcCard }> = ({ card }) => {
   const updateCardPosition = useParcOSStore(s => s.updateCardPosition);
+  const updateCardSize = useParcOSStore(s => s.updateCardSize);
   const setFocusedCard = useParcOSStore(s => s.setFocusedCard);
   const minimizeCard = useParcOSStore(s => s.minimizeCard);
+  const closeCard = useParcOSStore(s => s.closeCard);
   const enterSportsCinema = useParcOSStore(s => s.enterSportsCinema);
   const exitSportsCinema = useParcOSStore(s => s.exitSportsCinema);
   const activeWorkspace = useParcOSStore(s => s.activeWorkspace);
@@ -74,11 +87,16 @@ export const ParcCardView: React.FC<{ card: ParcCard }> = ({ card }) => {
   const activeSnapZone = useParcOSStore(s => s.activeSnapZone);
   const highlightedTeam = useParcOSStore(s => s.highlightedTeam);
   const enterCinema = useParcOSStore(s => s.enterCinema);
+  const exitCinema = useParcOSStore(s => s.exitCinema);
   const cinemaCardId = useParcOSStore(s => s.cinemaCardId);
   
   const isLinked = Boolean(highlightedTeam) && (card.appId === 'nil-dashboard' || card.appId === 'sports-multiview');
   
   const dragStartPos = useRef({ x: 0, y: 0 });
+  const resizeStartState = useRef({ width: 0, height: 0, x: 0, y: 0 });
+  const [isResizing, setIsResizing] = useState(false);
+  const [resizeEdge, setResizeEdge] = useState<string | null>(null);
+  
   const isFocused = card.layoutState.focused;
   const isSportsCinemaMode = activeWorkspace === 'SPORTS' && sportsMode === 'cinema' && isFocused;
   const isGlobalCinemaMode = cinemaCardId === card.id;
@@ -87,54 +105,128 @@ export const ParcCardView: React.FC<{ card: ParcCard }> = ({ card }) => {
 
   const maxZ = 10;
   const depthFactor = Math.min(Math.max(card.position.z / maxZ, 0.3), 1);
+  
+  const getBackdropBlur = () => {
+    if (isGlobalCinemaMode) return 'blur(60px)';
+    if (isFocused) return `blur(${32 + depthFactor * 16}px)`;
+    return `blur(${16 + depthFactor * 8}px)`;
+  };
 
   const getCardShadow = () => {
     if (isGlobalCinemaMode) {
       return [
-        `0 8px 16px rgba(0, 0, 0, 0.3)`,
-        `0 24px 48px rgba(0, 0, 0, 0.4)`,
-        `0 48px 96px rgba(0, 0, 0, 0.5)`,
-        `0 0 120px rgba(99, 102, 241, 0.6)`,
-        `0 0 200px rgba(139, 92, 246, 0.4)`,
-        `0 0 300px rgba(79, 70, 229, 0.25)`,
-        `inset 0 1px 0 rgba(255, 255, 255, 0.15)`
+        `0 8px 16px rgba(0, 0, 0, 0.35)`,
+        `0 24px 48px rgba(0, 0, 0, 0.45)`,
+        `0 48px 96px rgba(0, 0, 0, 0.55)`,
+        `0 0 120px rgba(99, 102, 241, 0.7)`,
+        `0 0 200px rgba(139, 92, 246, 0.5)`,
+        `0 0 300px rgba(79, 70, 229, 0.3)`,
+        `inset 0 1px 0 rgba(255, 255, 255, 0.2)`,
+        `inset 0 -2px 6px rgba(0, 0, 0, 0.3)`
       ].join(', ');
     }
     if (isFocused) {
       return [
-        `0 4px 8px rgba(0, 0, 0, ${0.15 * depthFactor})`,
-        `0 12px 24px rgba(0, 0, 0, ${0.2 * depthFactor})`,
-        `0 24px 48px rgba(0, 0, 0, ${0.25 * depthFactor})`,
-        `0 0 80px rgba(99, 102, 241, ${0.4 * depthFactor})`,
-        `0 0 120px rgba(139, 92, 246, ${0.25 * depthFactor})`,
-        `inset 0 1px 0 rgba(255, 255, 255, 0.1)`
+        `0 4px 8px rgba(0, 0, 0, ${0.18 * depthFactor})`,
+        `0 12px 24px rgba(0, 0, 0, ${0.25 * depthFactor})`,
+        `0 24px 48px rgba(0, 0, 0, ${0.3 * depthFactor})`,
+        `0 0 60px rgba(99, 102, 241, ${0.5 * depthFactor})`,
+        `0 0 100px rgba(139, 92, 246, ${0.35 * depthFactor})`,
+        `inset 0 1px 0 rgba(255, 255, 255, 0.15)`,
+        `inset 0 -1px 4px rgba(0, 0, 0, 0.2)`
       ].join(', ');
     }
     return [
-      `0 2px 4px rgba(0, 0, 0, ${0.08 * depthFactor})`,
-      `0 6px 12px rgba(0, 0, 0, ${0.1 * depthFactor})`,
-      `0 12px 24px rgba(0, 0, 0, ${0.12 * depthFactor})`
+      `0 2px 4px rgba(0, 0, 0, ${0.1 * depthFactor})`,
+      `0 6px 12px rgba(0, 0, 0, ${0.12 * depthFactor})`,
+      `0 12px 24px rgba(0, 0, 0, ${0.15 * depthFactor})`,
+      `inset 0 1px 0 rgba(255, 255, 255, 0.05)`,
+      `inset 0 -1px 2px rgba(0, 0, 0, 0.1)`
     ].join(', ');
   };
 
+  const handleResizeStart = useCallback((edge: string) => (e: React.PointerEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setIsResizing(true);
+    setResizeEdge(edge);
+    const startCardX = card.position.x;
+    resizeStartState.current = {
+      width: card.size.width,
+      height: card.size.height,
+      x: e.clientX,
+      y: e.clientY
+    };
+    setFocusedCard(card.id);
+    
+    const handleMove = (moveEvent: PointerEvent) => {
+      const deltaX = moveEvent.clientX - resizeStartState.current.x;
+      const deltaY = moveEvent.clientY - resizeStartState.current.y;
+      
+      let newWidth = resizeStartState.current.width;
+      let newHeight = resizeStartState.current.height;
+      let newX = startCardX;
+      
+      if (edge.includes('right') || edge === 'corner') {
+        newWidth = Math.max(MIN_WIDTH, resizeStartState.current.width + deltaX);
+      }
+      if (edge.includes('bottom') || edge === 'corner') {
+        newHeight = Math.max(MIN_HEIGHT, resizeStartState.current.height + deltaY);
+      }
+      if (edge === 'left') {
+        const potentialWidth = resizeStartState.current.width - deltaX;
+        if (potentialWidth >= MIN_WIDTH) {
+          newWidth = potentialWidth;
+          newX = startCardX + deltaX;
+        } else {
+          newWidth = MIN_WIDTH;
+          newX = startCardX + (resizeStartState.current.width - MIN_WIDTH);
+        }
+        updateCardPosition(card.id, { x: newX, y: card.position.y });
+      }
+      
+      updateCardSize(card.id, { width: newWidth, height: newHeight });
+    };
+    
+    const handleUp = () => {
+      setIsResizing(false);
+      setResizeEdge(null);
+      document.removeEventListener('pointermove', handleMove);
+      document.removeEventListener('pointerup', handleUp);
+    };
+    
+    document.addEventListener('pointermove', handleMove);
+    document.addEventListener('pointerup', handleUp);
+  }, [card.id, card.size, card.position, updateCardSize, updateCardPosition, setFocusedCard]);
+
+  const handleDoubleClick = useCallback(() => {
+    if (isGlobalCinemaMode) {
+      exitCinema();
+    } else {
+      enterCinema(card.id);
+    }
+  }, [isGlobalCinemaMode, exitCinema, enterCinema, card.id]);
+
   return (
     <motion.div
-      className={`absolute flex flex-col rounded-[32px] overflow-hidden transition-all duration-300 ${
+      className={`absolute flex flex-col rounded-[32px] overflow-visible transition-shadow duration-300 ${
         isFocused 
-          ? 'ring-1 ring-white/40 backdrop-blur-[40px]' 
-          : 'ring-1 ring-white/10 backdrop-blur-xl'
-      }`}
+          ? 'ring-1 ring-white/40' 
+          : 'ring-1 ring-white/10'
+      } ${isResizing ? 'ring-2 ring-indigo-400/60' : ''}`}
       style={{
         width: card.size.width,
         height: card.size.height,
         x: card.position.x,
         y: card.position.y,
-        zIndex: card.position.z,
-        backgroundColor: isFocused ? 'rgba(20, 20, 25, 0.7)' : 'rgba(20, 20, 25, 0.6)',
+        zIndex: isGlobalCinemaMode ? 1000 : card.position.z,
+        backgroundColor: isFocused ? 'rgba(20, 20, 25, 0.75)' : 'rgba(20, 20, 25, 0.6)',
         boxShadow: getCardShadow(),
+        backdropFilter: getBackdropBlur(),
+        WebkitBackdropFilter: getBackdropBlur(),
         opacity: isFocused ? 1 : 0.88,
       }}
-      drag
+      drag={!isResizing}
       dragMomentum={false}
       onDragStart={() => {
         dragStartPos.current = { x: card.position.x, y: card.position.y };
@@ -159,13 +251,13 @@ export const ParcCardView: React.FC<{ card: ParcCard }> = ({ card }) => {
         }
       }}
       onMouseDown={() => setFocusedCard(card.id)}
-      onDoubleClick={() => {
-        if (!isGlobalCinemaMode) {
-          enterCinema(card.id);
-        }
-      }}
+      onDoubleClick={handleDoubleClick}
       initial={{ opacity: 0, scale: 0.95, y: 20 }}
-      animate={{ opacity: 1, scale: isFocused ? 1.04 : 1, y: 0 }}
+      animate={{ 
+        opacity: 1, 
+        scale: isGlobalCinemaMode ? 1 : (isFocused ? 1.02 : 1), 
+        y: 0 
+      }}
       transition={{ type: "spring", stiffness: 300, damping: 28 }}
       data-testid={`card-${card.id}`}
       data-card-z={card.position.z}
@@ -177,7 +269,7 @@ export const ParcCardView: React.FC<{ card: ParcCard }> = ({ card }) => {
              <button 
                className="w-3 h-3 rounded-full bg-red-500/80 hover:bg-red-500 border border-white/10 transition-colors" 
                data-testid={`button-close-${card.id}`}
-               onClick={() => {}} 
+               onClick={(e) => { e.stopPropagation(); closeCard(card.id); }} 
              />
              <button 
                className="w-3 h-3 rounded-full bg-yellow-500/80 hover:bg-yellow-500 border border-white/10 transition-colors" 
@@ -187,7 +279,7 @@ export const ParcCardView: React.FC<{ card: ParcCard }> = ({ card }) => {
              <button 
                className="w-3 h-3 rounded-full bg-green-500/80 hover:bg-green-500 border border-white/10 transition-colors" 
                data-testid={`button-maximize-${card.id}`}
-               onClick={() => {}} 
+               onClick={(e) => { e.stopPropagation(); handleDoubleClick(); }} 
              />
           </div>
         </div>
@@ -243,7 +335,7 @@ export const ParcCardView: React.FC<{ card: ParcCard }> = ({ card }) => {
       </div>
 
       {/* CMFK Indicator (Footer) */}
-      <div className="h-8 shrink-0 border-t border-white/5 bg-black/20 flex items-center px-4 justify-between">
+      <div className="h-8 shrink-0 border-t border-white/5 bg-black/20 flex items-center px-4 justify-between rounded-b-[32px]">
           <div className="flex items-center gap-2">
             <div className="w-1.5 h-1.5 rounded-full bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.6)]"></div>
             <span className="text-[10px] font-mono text-blue-300/80 uppercase tracking-widest" data-testid={`text-cmfk-${card.id}`}>
@@ -252,6 +344,47 @@ export const ParcCardView: React.FC<{ card: ParcCard }> = ({ card }) => {
           </div>
           <span className="text-[10px] text-white/20 font-mono">{card.id.slice(0,4)}</span>
       </div>
+
+      {/* Resize Handles */}
+      {!isGlobalCinemaMode && (
+        <>
+          {/* Bottom-right corner handle (primary) */}
+          <div
+            className="absolute -bottom-1 -right-1 w-6 h-6 cursor-nwse-resize z-10 group"
+            onPointerDown={handleResizeStart('corner')}
+            data-testid={`resize-corner-${card.id}`}
+          >
+            <div className="absolute bottom-1 right-1 w-3 h-3 border-r-2 border-b-2 border-white/20 group-hover:border-indigo-400/60 rounded-br-sm transition-colors" />
+          </div>
+          
+          {/* Right edge handle */}
+          <div
+            className="absolute top-12 -right-1 bottom-8 w-2 cursor-ew-resize opacity-0 hover:opacity-100 transition-opacity z-10"
+            onPointerDown={handleResizeStart('right')}
+            data-testid={`resize-right-${card.id}`}
+          >
+            <div className="absolute inset-y-0 right-0 w-1 bg-indigo-400/40 rounded-full" />
+          </div>
+          
+          {/* Bottom edge handle */}
+          <div
+            className="absolute left-4 -bottom-1 right-4 h-2 cursor-ns-resize opacity-0 hover:opacity-100 transition-opacity z-10"
+            onPointerDown={handleResizeStart('bottom')}
+            data-testid={`resize-bottom-${card.id}`}
+          >
+            <div className="absolute inset-x-0 bottom-0 h-1 bg-indigo-400/40 rounded-full" />
+          </div>
+          
+          {/* Left edge handle */}
+          <div
+            className="absolute top-12 -left-1 bottom-8 w-2 cursor-ew-resize opacity-0 hover:opacity-100 transition-opacity z-10"
+            onPointerDown={handleResizeStart('left')}
+            data-testid={`resize-left-${card.id}`}
+          >
+            <div className="absolute inset-y-0 left-0 w-1 bg-indigo-400/40 rounded-full" />
+          </div>
+        </>
+      )}
     </motion.div>
   );
 };
