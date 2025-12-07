@@ -23,13 +23,14 @@ interface LaneConfig {
   xMax: number;
   scale: number;
   opacity: number;
+  zBase: number;
 }
 
 const LANE_CONFIGS: Record<Lane, LaneConfig> = {
-  focus: { xMin: 0.05, xMax: 0.25, scale: 1.1, opacity: 1.0 },
-  work: { xMin: 0.30, xMax: 0.60, scale: 1.0, opacity: 1.0 },
-  archive: { xMin: 0.65, xMax: 0.85, scale: 0.85, opacity: 0.7 },
-  background: { xMin: 0.88, xMax: 0.98, scale: 0.6, opacity: 0.4 }
+  focus: { xMin: 0.05, xMax: 0.25, scale: 1.1, opacity: 1.0, zBase: 100 },
+  work: { xMin: 0.30, xMax: 0.60, scale: 1.0, opacity: 1.0, zBase: 50 },
+  archive: { xMin: 0.65, xMax: 0.85, scale: 0.85, opacity: 0.7, zBase: 20 },
+  background: { xMin: 0.88, xMax: 0.98, scale: 0.6, opacity: 0.4, zBase: 1 }
 };
 
 function layoutCards(cards: ParcCard[]): ParcCard[] {
@@ -76,7 +77,8 @@ function layoutCards(cards: ParcCard[]): ParcCard[] {
         position: {
           ...card.position,
           x,
-          y
+          y,
+          z: config.zBase + idx
         },
         size: {
           width: scaledWidth,

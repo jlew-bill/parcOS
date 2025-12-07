@@ -35,9 +35,7 @@ export const Dock: React.FC = () => {
     
     // Set active workspace
     if (item.workspace && item.stack) {
-      setActiveWorkspace(item.workspace, item.stack);
-      
-      // Find or create stack
+      // Find or create stack first, so we can use the actual stackId
       const existingStack = allStacks.find(s => s.domain === item.stack);
       const stackId = existingStack?.id || nanoid();
       
@@ -55,6 +53,9 @@ export const Dock: React.FC = () => {
         };
         useParcOSStore.getState().createStack(newStack);
       }
+      
+      // Set active workspace with actual stackId (not domain string)
+      setActiveWorkspace(item.workspace, stackId);
       
       // Spawn default cards for sports workspace
       if (item.workspace === 'SPORTS') {

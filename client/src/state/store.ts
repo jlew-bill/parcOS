@@ -230,9 +230,13 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
   },
 
   addHighlight: (highlight) => {
-    set((state) => ({
-      highlights: [...state.highlights, highlight]
-    }));
+    set((state) => {
+      const existingIds = new Set(state.highlights.map(h => h.id));
+      if (existingIds.has(highlight.id)) {
+        return state;
+      }
+      return { highlights: [...state.highlights, highlight] };
+    });
     
     const cmfkScore = highlight.cmfk 
       ? (highlight.cmfk.correctness + highlight.cmfk.knowingness) / 2 
@@ -821,14 +825,8 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
     
     const updatedCards: Record<string, ParcCard> = { ...state.cards };
     
-    layoutedCards.forEach((card, idx) => {
-      updatedCards[card.id] = {
-        ...card,
-        position: {
-          ...card.position,
-          z: idx + 1
-        }
-      };
+    layoutedCards.forEach((card) => {
+      updatedCards[card.id] = card;
     });
     
     set({ cards: updatedCards });

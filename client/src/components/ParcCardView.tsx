@@ -6,6 +6,7 @@ import { Minimize2, GripHorizontal, Play, X, Link2 } from 'lucide-react';
 import { NILDashboard } from '@/apps/NILDashboard';
 import { ClassroomBoard } from '@/apps/ClassroomBoard';
 import { GenericBrowserCard } from '@/apps/GenericBrowserCard';
+import { cmfkEngine } from '@/services/cmfk-engine';
 
 const SportsMultiView = React.lazy(() => import('@/apps/SportsMultiView').then(m => ({ default: m.SportsMultiView })));
 
@@ -89,6 +90,7 @@ export const ParcCardView: React.FC<{ card: ParcCard }> = ({ card }) => {
   const enterCinema = useParcOSStore(s => s.enterCinema);
   const exitCinema = useParcOSStore(s => s.exitCinema);
   const cinemaCardId = useParcOSStore(s => s.cinemaCardId);
+  const updateCardCMFK = useParcOSStore(s => s.updateCardCMFK);
   
   const isLinked = Boolean(highlightedTeam) && (card.appId === 'nil-dashboard' || card.appId === 'sports-multiview');
   
@@ -207,6 +209,19 @@ export const ParcCardView: React.FC<{ card: ParcCard }> = ({ card }) => {
     }
   }, [isGlobalCinemaMode, exitCinema, enterCinema, card.id]);
 
+  const handleCMFKUpdate = useCallback((eventType: 'hover' | 'click' | 'view') => {
+    // Read current CMFK from the store directly, not from stale props
+    // This ensures rapid sequential events (mousedown + click) each read the latest state
+    const currentCard = useParcOSStore.getState().cards[card.id];
+    if (!currentCard) return;
+    const shortCMFK = cmfkEngine.convertFromCMFKVector(currentCard.cmfk);
+    const newShortCMFK = cmfkEngine.updateCMFK(shortCMFK, { type: eventType });
+    const newCMFK = cmfkEngine.convertToCMFKVector(newShortCMFK);
+    updateCardCMFK(card.id, newCMFK, true);
+  }, [card.id, updateCardCMFK]);
+
+  const laneOpacity = card.metadata?.laneOpacity ?? 1;
+
   return (
     <motion.div
       className={`absolute flex flex-col rounded-[32px] overflow-visible transition-shadow duration-300 ${
@@ -224,7 +239,7 @@ export const ParcCardView: React.FC<{ card: ParcCard }> = ({ card }) => {
         boxShadow: getCardShadow(),
         backdropFilter: getBackdropBlur(),
         WebkitBackdropFilter: getBackdropBlur(),
-        opacity: isFocused ? 1 : 0.88,
+        opacity: isGlobalCinemaMode ? 1 : (isFocused ? 1 : laneOpacity * 0.88),
       }}
       drag={!isResizing}
       dragMomentum={false}
@@ -250,7 +265,9 @@ export const ParcCardView: React.FC<{ card: ParcCard }> = ({ card }) => {
           setActiveSnapZone(null);
         }
       }}
-      onMouseDown={() => setFocusedCard(card.id)}
+      onMouseEnter={() => handleCMFKUpdate('hover')}
+      onMouseDown={() => { setFocusedCard(card.id); handleCMFKUpdate('view'); }}
+      onClick={() => handleCMFKUpdate('click')}
       onDoubleClick={handleDoubleClick}
       initial={{ opacity: 0, scale: 0.95, y: 20 }}
       animate={{ 
