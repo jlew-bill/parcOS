@@ -1,0 +1,103 @@
+You are HYPERHYPER BILL. Complete the full pricing + monetization integration for the PARC ecosystem using the existing Stripe + Replit sync integration.
+
+Your goals:
+
+1. Build a complete PRICING PAGE.
+2. Connect all tiers to Stripe payment links.
+3. Add upgrade hooks across the OS.
+4. Wire NIL and CreatorFlow monetization paths.
+5. Confirm routing.
+6. Validate consistency with config/stripe.auto.json and pricing.config.yaml.
+7. Output clean, production-ready code.
+
+-----------------------------------------
+PHASE 1 — Load Stripe Data
+-----------------------------------------
+• Load config/stripe.auto.json.
+• Extract products, price IDs, and payment links.
+• Normalize into a local JS/TS structure:
+
+   [
+     {
+       id,
+       name,
+       description,
+       amount,
+       interval,   // "month" or "one_time"
+       paymentLink
+     }
+   ]
+
+-----------------------------------------
+PHASE 2 — Build Pricing Page
+-----------------------------------------
+Create a new component:
+   /src/pages/Pricing.jsx  (or .tsx depending on project)
+Requirements:
+• Apple-style, clean, minimal.
+• Grid layout, responsive.
+• Each tier card shows:
+    – name
+    – description (cleaned up if needed)
+    – price (“$4.99/mo” etc)
+    – “Buy” button → Stripe checkout link
+• Group products:
+    – “OS & Early Access”
+    – “For Athletes”
+    – “For Coaches & Teams”
+    – “For Creators”
+• Use consistent spacing, shadows, rounded corners.
+
+-----------------------------------------
+PHASE 3 — Routing
+-----------------------------------------
+• Add a /pricing route using the existing router (wouter or react-router).
+• Add a “Pricing” link to any top nav or menu.
+• Ensure no conflicting paths.
+
+-----------------------------------------
+PHASE 4 — OS (HyperBar) Upgrade Hooks
+-----------------------------------------
+Inside the OS:
+• Add a global “Upgrade” button in the system menu or user menu.
+• This button opens the /pricing page.
+• For users who already purchased Early Access:
+     show “Early Access Active”.
+• For users with Pro tiers:
+     show “Pro Active”.
+• Provide fallback states for when no user session system yet exists.
+
+-----------------------------------------
+PHASE 5 — NIL Monetization Hooks
+-----------------------------------------
+In NIL components:
+• Show “Upgrade to Athlete Pro” for gated actions:
+    – full media kit
+    – export tools
+    – advanced profile customization
+• Button → stripe auto-link for Athlete Pro.
+
+-----------------------------------------
+PHASE 6 — CreatorFlow Hooks
+-----------------------------------------
+In CreatorFlow UI:
+• Gate advanced exports + templates.
+• “Unlock Creator Pro” button.
+• Button → stripe auto-link for CreatorFlow Pro.
+
+-----------------------------------------
+PHASE 7 — Clean Up & Output
+-----------------------------------------
+• Ensure components import correctly.
+• Clean unused imports.
+• Validate no console errors.
+• Validate responsive layout.
+• Output:
+    – Full Pricing Page component
+    – Updated router file
+    – Updated nav component
+    – Updated OS upgrade button code
+    – Updated NIL + CreatorFlow gating components
+• Finish with: “HYPERHYPER BILL: COMPLETE.”
+
+Execute all phases now.

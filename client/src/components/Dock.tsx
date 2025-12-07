@@ -21,15 +21,17 @@ export const Dock: React.FC = () => {
   const [expandMinimized, setExpandMinimized] = useState(false);
 
   const dockItems = [
-    { id: 'sports', icon: Trophy, label: 'Sports', app: 'sports-multiview', workspace: 'SPORTS', stack: 'sports' },
-    { id: 'nil', icon: DollarSign, label: 'NIL', app: 'nil-dashboard', workspace: 'NIL', stack: 'nil' },
-    { id: 'class', icon: GraduationCap, label: 'Classroom', app: 'classroom-board', workspace: 'CLASSROOM', stack: 'classroom' },
-    { id: 'browser', icon: Globe, label: 'Browser', app: 'generic-browser', workspace: null, stack: null },
-    { id: 'creator', icon: LayoutGrid, label: 'Creator', app: 'creator-studio', workspace: null, stack: null },
-    { id: 'system', icon: Settings, label: 'System', app: 'system-tools', workspace: null, stack: null },
+    { id: 'sports', icon: Trophy, label: 'Sports', app: 'sports-multiview', workspace: 'SPORTS', stack: 'sports', isPremium: false },
+    { id: 'nil', icon: DollarSign, label: 'NIL', app: 'nil-dashboard', workspace: 'NIL', stack: 'nil', isPremium: true, tier: 'athlete_pro' },
+    { id: 'class', icon: GraduationCap, label: 'Classroom', app: 'classroom-board', workspace: 'CLASSROOM', stack: 'classroom', isPremium: false },
+    { id: 'browser', icon: Globe, label: 'Browser', app: 'generic-browser', workspace: null, stack: null, isPremium: false },
+    { id: 'creator', icon: LayoutGrid, label: 'Creator', app: 'creator-studio', workspace: null, stack: null, isPremium: true, tier: 'creator_pro' },
+    { id: 'system', icon: Settings, label: 'System', app: 'system-tools', workspace: null, stack: null, isPremium: false },
   ];
 
   const handleLaunch = (item: typeof dockItems[0]) => {
+    // In a real app, check user subscription here
+    // For now, allow all launches as a demo
     const stacks = useParcOSStore.getState().stacks;
     const allStacks = Object.values(stacks);
     
@@ -132,13 +134,19 @@ export const Dock: React.FC = () => {
         layout
       >
         {dockItems.map((item) => (
-          <DockItem 
-            key={item.id} 
-            icon={item.icon} 
-            label={item.label} 
-            onClick={() => handleLaunch(item)}
-            data-testid={`dock-button-${item.label}`}
-          />
+          <div key={item.id} className="relative">
+            <DockItem 
+              icon={item.icon} 
+              label={item.label} 
+              onClick={() => handleLaunch(item)}
+              data-testid={`dock-button-${item.label}`}
+            />
+            {item.isPremium && (
+              <div className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-indigo-600 border border-indigo-400 flex items-center justify-center">
+                <span className="text-xs font-bold text-white" data-testid={`badge-premium-${item.label}`}>+</span>
+              </div>
+            )}
+          </div>
         ))}
         
         <div className="w-[1px] h-10 bg-white/10 mx-1"></div>
