@@ -83,6 +83,8 @@ export const SNAP_ZONE_DEFINITIONS: Record<SnapZoneType, SnapZoneDefinition> = {
 
 export type HighlightType = 'score_change' | 'lead_change' | 'run' | 'momentum_reversal' | 'injury' | 'turnover' | 'big_play';
 
+export type Lane = "focus" | "work" | "archive" | "background";
+
 export interface CardLink {
   cardIds: string[];
   linkType: string;
@@ -183,4 +185,10 @@ export interface ParcOSState {
   // Global cinema mode actions (QuickLook-style)
   enterCinema: (cardId: string) => void;
   exitCinema: () => void;
+  
+  // CMFK update action
+  updateCardCMFK: (cardId: string, cmfk: CMFKVector, recomputeLayout?: boolean) => void;
+  
+  // Spatial engine layout action
+  recomputeSpatialLayout: (workspace?: string) => void;
 }

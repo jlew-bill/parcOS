@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { ParcOSState, ParcCard, ParcStack, ParcApp, ParcMessage, CMFKVector, Highlight, SnapZoneType, SNAP_ZONE_DEFINITIONS, CardLink } from './types';
 import { nanoid } from 'nanoid';
 import { highlightsApi, workspacesApi, gameEventsApi } from '@/lib/api';
+import { spatialEngine } from '@/services/spatial-engine';
 
 const INITIAL_CMFK: CMFKVector = {
   correctness: 0,
@@ -35,9 +36,12 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
   cinemaCardId: null,
   cinemaOriginalState: null,
 
-  addCard: (card) => set((state) => ({
-    cards: { ...state.cards, [card.id]: card }
-  })),
+  addCard: (card) => {
+    set((state) => ({
+      cards: { ...state.cards, [card.id]: card }
+    }));
+    get().recomputeSpatialLayout();
+  },
 
   updateCardPosition: (id, pos) => set((state) => {
     const card = state.cards[id];
@@ -116,31 +120,34 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
     };
   }),
 
-  restoreCard: (id) => set((state) => {
-    const card = state.cards[id];
-    const lastPos = state.lastCardPositions[id];
-    
-    if (!card) return state;
-    
-    const maxZ = Math.max(...Object.values(state.cards).map(c => c.position.z), 0);
-    
-    return {
-      minimizedCards: state.minimizedCards.filter(cid => cid !== id),
-      cards: {
-        ...state.cards,
-        [id]: {
-          ...card,
-          layoutState: { ...card.layoutState, minimized: false, focused: true },
-          position: {
-            x: lastPos?.x ?? card.position.x,
-            y: lastPos?.y ?? card.position.y,
-            z: maxZ + 1
+  restoreCard: (id) => {
+    set((state) => {
+      const card = state.cards[id];
+      const lastPos = state.lastCardPositions[id];
+      
+      if (!card) return state;
+      
+      const maxZ = Math.max(...Object.values(state.cards).map(c => c.position.z), 0);
+      
+      return {
+        minimizedCards: state.minimizedCards.filter(cid => cid !== id),
+        cards: {
+          ...state.cards,
+          [id]: {
+            ...card,
+            layoutState: { ...card.layoutState, minimized: false, focused: true },
+            position: {
+              x: lastPos?.x ?? card.position.x,
+              y: lastPos?.y ?? card.position.y,
+              z: maxZ + 1
+            }
           }
-        }
-      },
-      focusedCardId: id
-    };
-  }),
+        },
+        focusedCardId: id
+      };
+    });
+    get().recomputeSpatialLayout();
+  },
 
   setActiveWorkspace: (workspace, stack) => set({ 
     activeWorkspace: workspace, 
@@ -592,6 +599,7 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
       focusedCardId: lastCardId 
     });
     console.log(`[BILL] Restored ${count} cards`);
+    get().recomputeSpatialLayout();
     return { count };
   },
 
@@ -771,7 +779,61 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
         }
       }
     };
-  })
+  }),
+
+  updateCardCMFK: (cardId: string, cmfk: CMFKVector, recomputeLayout = true) => {
+    set((state) => {
+      const card = state.cards[cardId];
+      if (!card) return state;
+      return {
+        cards: {
+          ...state.cards,
+          [cardId]: {
+            ...card,
+            cmfk,
+            updatedAt: new Date().toISOString()
+          }
+        }
+      };
+    });
+    
+    if (recomputeLayout) {
+      get().recomputeSpatialLayout();
+    }
+  },
+
+  recomputeSpatialLayout: (workspace?: string) => {
+    const state = get();
+    
+    let cardsToLayout = Object.values(state.cards).filter(card => {
+      if (card.layoutState.minimized) return false;
+      if (card.layoutState.pinned) return false;
+      if (workspace && card.metadata?.workspace !== workspace) return false;
+      return true;
+    });
+    
+    if (cardsToLayout.length === 0) {
+      console.log('[Spatial] No cards to layout');
+      return;
+    }
+    
+    const layoutedCards = spatialEngine.layoutCards(cardsToLayout);
+    
+    const updatedCards: Record<string, ParcCard> = { ...state.cards };
+    
+    layoutedCards.forEach((card, idx) => {
+      updatedCards[card.id] = {
+        ...card,
+        position: {
+          ...card.position,
+          z: idx + 1
+        }
+      };
+    });
+    
+    set({ cards: updatedCards });
+    console.log(`[Spatial] Recomputed layout for ${cardsToLayout.length} cards`);
+  }
 }));
 
 // Helper to initialize some default state
