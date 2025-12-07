@@ -27,11 +27,31 @@ interface LaneConfig {
 }
 
 const LANE_CONFIGS: Record<Lane, LaneConfig> = {
-  focus: { xMin: 0.05, xMax: 0.25, scale: 1.1, opacity: 1.0, zBase: 100 },
-  work: { xMin: 0.30, xMax: 0.60, scale: 1.0, opacity: 1.0, zBase: 50 },
-  archive: { xMin: 0.65, xMax: 0.85, scale: 0.85, opacity: 0.7, zBase: 20 },
-  background: { xMin: 0.88, xMax: 0.98, scale: 0.6, opacity: 0.4, zBase: 1 }
+  focus: { xMin: 0.05, xMax: 0.25, scale: 1.1, opacity: 1.0, zBase: 300 },
+  work: { xMin: 0.30, xMax: 0.60, scale: 1.0, opacity: 1.0, zBase: 200 },
+  archive: { xMin: 0.65, xMax: 0.85, scale: 0.85, opacity: 0.7, zBase: 100 },
+  background: { xMin: 0.88, xMax: 0.98, scale: 0.6, opacity: 0.4, zBase: 0 }
 };
+
+function getLaneZBase(lane: string): number {
+  switch (lane) {
+    case 'focus': return 300;
+    case 'work': return 200;
+    case 'archive': return 100;
+    case 'background': return 0;
+    default: return 0;
+  }
+}
+
+function getMaxZForLane(lane: string): number {
+  switch (lane) {
+    case 'focus': return 399;
+    case 'work': return 299;
+    case 'archive': return 199;
+    case 'background': return 99;
+    default: return 99;
+  }
+}
 
 function layoutCards(cards: ParcCard[]): ParcCard[] {
   const windowWidth = typeof window !== 'undefined' ? window.innerWidth : 1920;
@@ -102,7 +122,9 @@ export const spatialEngine = {
   assignLane,
   layoutCards,
   getCardLane,
-  computePriority
+  computePriority,
+  getLaneZBase,
+  getMaxZForLane
 };
 
-export { assignLane, layoutCards, getCardLane };
+export { assignLane, layoutCards, getCardLane, getLaneZBase, getMaxZForLane };

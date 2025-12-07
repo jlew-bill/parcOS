@@ -58,12 +58,23 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
   }),
 
   setFocusedCard: (id) => set((state) => {
-    const maxZ = Math.max(...Object.values(state.cards).map(c => c.position.z), 0);
     const card = state.cards[id];
     
     if (!card) return { focusedCardId: id };
 
-    // Unfocus all other cards
+    const lane = spatialEngine.getCardLane(card);
+    const laneZBase = spatialEngine.getLaneZBase(lane);
+    const laneMaxZ = spatialEngine.getMaxZForLane(lane);
+    
+    const sameLaneCards = Object.values(state.cards).filter(
+      c => spatialEngine.getCardLane(c) === lane
+    );
+    const maxZInLane = Math.max(
+      ...sameLaneCards.map(c => c.position.z),
+      laneZBase
+    );
+    const newZ = Math.min(maxZInLane + 1, laneMaxZ);
+
     const updatedCards: Record<string, ParcCard> = {};
     Object.keys(state.cards).forEach(cid => {
       updatedCards[cid] = {
@@ -78,7 +89,7 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
         ...updatedCards,
         [id]: {
           ...updatedCards[id],
-          position: { ...updatedCards[id].position, z: maxZ + 1 },
+          position: { ...updatedCards[id].position, z: newZ },
           layoutState: { ...updatedCards[id].layoutState, focused: true }
         }
       }
@@ -127,7 +138,18 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
       
       if (!card) return state;
       
-      const maxZ = Math.max(...Object.values(state.cards).map(c => c.position.z), 0);
+      const lane = spatialEngine.getCardLane(card);
+      const laneZBase = spatialEngine.getLaneZBase(lane);
+      const laneMaxZ = spatialEngine.getMaxZForLane(lane);
+      
+      const sameLaneCards = Object.values(state.cards).filter(
+        c => c.id !== id && spatialEngine.getCardLane(c) === lane
+      );
+      const maxZInLane = Math.max(
+        ...sameLaneCards.map(c => c.position.z),
+        laneZBase
+      );
+      const newZ = Math.min(maxZInLane + 1, laneMaxZ);
       
       return {
         minimizedCards: state.minimizedCards.filter(cid => cid !== id),
@@ -139,7 +161,7 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
             position: {
               x: lastPos?.x ?? card.position.x,
               y: lastPos?.y ?? card.position.y,
-              z: maxZ + 1
+              z: newZ
             }
           }
         },
@@ -336,57 +358,71 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
 
   setDragging: (isDragging, cardId) => set({ isDragging, draggingCardId: cardId }),
 
-  snapCardToZone: (cardId, zone) => set((state) => {
-    const card = state.cards[cardId];
-    if (!card) return state;
+  snapCardToZone: (cardId, zone) => {
+    set((state) => {
+      const card = state.cards[cardId];
+      if (!card) return state;
 
-    const zoneDef = SNAP_ZONE_DEFINITIONS[zone];
-    if (!zoneDef) return state;
+      const zoneDef = SNAP_ZONE_DEFINITIONS[zone];
+      if (!zoneDef) return state;
 
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
+      const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
 
-    const parseValue = (value: number | string, total: number): number => {
-      if (typeof value === 'number') return value;
-      if (value.includes('%')) {
-        return (parseFloat(value) / 100) * total;
-      }
-      if (value.includes('calc')) {
-        const match = value.match(/calc\((\d+)%\s*([+-])\s*(\d+)px\)/);
-        if (match) {
-          const percent = parseFloat(match[1]);
-          const operator = match[2];
-          const pixels = parseFloat(match[3]);
-          const baseValue = (percent / 100) * total;
-          return operator === '+' ? baseValue + pixels : baseValue - pixels;
+      const parseValue = (value: number | string, total: number): number => {
+        if (typeof value === 'number') return value;
+        if (value.includes('%')) {
+          return (parseFloat(value) / 100) * total;
         }
-      }
-      return parseFloat(value) || 0;
-    };
-
-    const newX = parseValue(zoneDef.x, windowWidth);
-    const newY = parseValue(zoneDef.y, windowHeight);
-    const newWidth = parseValue(zoneDef.width, windowWidth);
-    const newHeight = parseValue(zoneDef.height, windowHeight);
-
-    const maxZ = Math.max(...Object.values(state.cards).map(c => c.position.z), 0);
-
-    return {
-      cards: {
-        ...state.cards,
-        [cardId]: {
-          ...card,
-          position: { x: newX, y: newY, z: maxZ + 1 },
-          size: { width: newWidth, height: newHeight },
-          layoutState: { ...card.layoutState, focused: true }
+        if (value.includes('calc')) {
+          const match = value.match(/calc\((\d+)%\s*([+-])\s*(\d+)px\)/);
+          if (match) {
+            const percent = parseFloat(match[1]);
+            const operator = match[2];
+            const pixels = parseFloat(match[3]);
+            const baseValue = (percent / 100) * total;
+            return operator === '+' ? baseValue + pixels : baseValue - pixels;
+          }
         }
-      },
-      focusedCardId: cardId,
-      activeSnapZone: null,
-      isDragging: false,
-      draggingCardId: null
-    };
-  }),
+        return parseFloat(value) || 0;
+      };
+
+      const newX = parseValue(zoneDef.x, windowWidth);
+      const newY = parseValue(zoneDef.y, windowHeight);
+      const newWidth = parseValue(zoneDef.width, windowWidth);
+      const newHeight = parseValue(zoneDef.height, windowHeight);
+
+      const lane = spatialEngine.getCardLane(card);
+      const laneZBase = spatialEngine.getLaneZBase(lane);
+      const laneMaxZ = spatialEngine.getMaxZForLane(lane);
+      
+      const sameLaneCards = Object.values(state.cards).filter(
+        c => c.id !== cardId && spatialEngine.getCardLane(c) === lane
+      );
+      const maxZInLane = Math.max(
+        ...sameLaneCards.map(c => c.position.z),
+        laneZBase
+      );
+      const newZ = Math.min(maxZInLane + 1, laneMaxZ);
+
+      return {
+        cards: {
+          ...state.cards,
+          [cardId]: {
+            ...card,
+            position: { x: newX, y: newY, z: newZ },
+            size: { width: newWidth, height: newHeight },
+            layoutState: { ...card.layoutState, focused: true }
+          }
+        },
+        focusedCardId: cardId,
+        activeSnapZone: null,
+        isDragging: false,
+        draggingCardId: null
+      };
+    });
+    get().recomputeSpatialLayout();
+  },
 
   tileCards: () => {
     const state = get();
@@ -618,7 +654,18 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
     );
     
     if (matchedCard) {
-      const maxZ = Math.max(...allCards.map(c => c.position.z), 0);
+      const lane = spatialEngine.getCardLane(matchedCard);
+      const laneZBase = spatialEngine.getLaneZBase(lane);
+      const laneMaxZ = spatialEngine.getMaxZForLane(lane);
+      
+      const sameLaneCards = allCards.filter(
+        c => c.id !== matchedCard.id && spatialEngine.getCardLane(c) === lane
+      );
+      const maxZInLane = Math.max(
+        ...sameLaneCards.map(c => c.position.z),
+        laneZBase
+      );
+      const newZ = Math.min(maxZInLane + 1, laneMaxZ);
       
       const updatedCards: Record<string, ParcCard> = {};
       Object.keys(state.cards).forEach(cid => {
@@ -630,7 +677,7 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
       
       updatedCards[matchedCard.id] = {
         ...updatedCards[matchedCard.id],
-        position: { ...updatedCards[matchedCard.id].position, z: maxZ + 1 }
+        position: { ...updatedCards[matchedCard.id].position, z: newZ }
       };
 
       set({ 
@@ -639,6 +686,7 @@ export const useParcOSStore = create<ParcOSState>((set, get) => ({
         minimizedCards: state.minimizedCards.filter(id => id !== matchedCard.id)
       });
       console.log(`[BILL] Focused card: ${matchedCard.title}`);
+      get().recomputeSpatialLayout();
       return { found: true, cardId: matchedCard.id, title: matchedCard.title };
     }
     

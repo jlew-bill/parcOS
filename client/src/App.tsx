@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
-import { SystemBar } from '@/components/SystemBar';
 import { Dock } from '@/components/Dock';
 import { Canvas } from '@/components/Canvas';
 import { BillOverlay } from '@/components/BillOverlay';
+import { SpatialHUD } from '@/components/SpatialHUD';
 import { initializeState, useParcOSStore } from '@/state/store';
 import { Toaster } from "@/components/ui/toaster";
 import { highlightEngine } from '@/services/highlight-engine';
@@ -67,16 +67,17 @@ function App() {
 
   return (
     <div className="w-full h-screen bg-[#0a0a0c] text-white overflow-visible font-sans selection:bg-indigo-500/30">
-      <SystemBar />
       <Canvas />
+      <SpatialHUD />
       <Dock />
       <BillOverlay />
       <Toaster />
       
-      {/* Background ambient light */}
+      {/* Ambient environment lighting */}
       <div className="fixed inset-0 z-[-1] pointer-events-none">
-          <div className="absolute top-[-20%] left-[20%] w-[600px] h-[600px] bg-purple-900/20 rounded-full blur-[120px] opacity-40 mix-blend-screen animate-pulse duration-10000" />
-          <div className="absolute bottom-[-10%] right-[10%] w-[500px] h-[500px] bg-blue-900/20 rounded-full blur-[100px] opacity-30 mix-blend-screen" />
+          <div className="absolute top-[-30%] left-[10%] w-[800px] h-[800px] bg-indigo-900/15 rounded-full blur-[150px] opacity-50 mix-blend-screen" />
+          <div className="absolute bottom-[-20%] right-[5%] w-[700px] h-[700px] bg-purple-900/15 rounded-full blur-[130px] opacity-40 mix-blend-screen" />
+          <div className="absolute top-[40%] right-[30%] w-[400px] h-[400px] bg-blue-900/10 rounded-full blur-[100px] opacity-30 mix-blend-screen" />
       </div>
     </div>
   );

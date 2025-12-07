@@ -210,13 +210,12 @@ export const ParcCardView: React.FC<{ card: ParcCard }> = ({ card }) => {
   }, [isGlobalCinemaMode, exitCinema, enterCinema, card.id]);
 
   const handleCMFKUpdate = useCallback((eventType: 'hover' | 'click' | 'view') => {
-    // Read current CMFK from the store directly, not from stale props
-    // This ensures rapid sequential events (mousedown + click) each read the latest state
     const currentCard = useParcOSStore.getState().cards[card.id];
     if (!currentCard) return;
     const shortCMFK = cmfkEngine.convertFromCMFKVector(currentCard.cmfk);
     const newShortCMFK = cmfkEngine.updateCMFK(shortCMFK, { type: eventType });
     const newCMFK = cmfkEngine.convertToCMFKVector(newShortCMFK);
+    console.log(`[CMFK] ${eventType} on ${card.id.slice(0,6)}: k ${Math.round(currentCard.cmfk.knowingness * 100)}% -> ${Math.round(newCMFK.knowingness * 100)}%`);
     updateCardCMFK(card.id, newCMFK, true);
   }, [card.id, updateCardCMFK]);
 
