@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useParcOSStore } from '@/state/store';
 import { Bot, User, Bell, Search, Hexagon } from 'lucide-react';
 import { UserMenu } from './UserMenu';
+import { parcGlass, glassStyles } from '@/design/parcGlass';
 
 export const SystemBar: React.FC = () => {
   const workspaceName = useParcOSStore(state => state.workspaceName);
@@ -14,14 +15,41 @@ export const SystemBar: React.FC = () => {
   const displayName = activeWorkspace || workspaceName;
 
   return (
-    <div className="fixed top-0 left-0 right-0 h-12 z-50 flex items-center justify-between px-6 glass-panel border-b border-white/10 rounded-none">
+    <div 
+      className="fixed top-0 left-0 right-0 flex items-center justify-between px-6"
+      style={{
+        height: parcGlass.spacing.systemBarHeight,
+        zIndex: parcGlass.zIndex.systemBar,
+        background: 'hsla(240, 15%, 8%, 0.85)',
+        backdropFilter: parcGlass.blur.dock,
+        WebkitBackdropFilter: parcGlass.blur.dock,
+        borderBottom: parcGlass.borders.thin,
+      }}
+    >
       <div className="flex items-center gap-3">
         <Hexagon className="w-5 h-5 text-white fill-white/20" />
         <span className="font-semibold tracking-wide text-sm font-mono text-white/90">parcOS</span>
       </div>
 
-      <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
-        <span className="text-xs font-medium text-white/80 uppercase tracking-wider">{displayName}</span>
+      <div 
+        className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-1"
+        style={{
+          borderRadius: parcGlass.radius.pill,
+          background: parcGlass.colors.mistGlass.light,
+          border: parcGlass.borders.thin,
+          backdropFilter: parcGlass.blur.md,
+        }}
+      >
+        <span 
+          className="font-medium uppercase"
+          style={{
+            fontSize: parcGlass.typography.fontSize.xs,
+            color: 'hsla(0, 0%, 100%, 0.8)',
+            letterSpacing: parcGlass.typography.letterSpacing.wider,
+          }}
+        >
+          {displayName}
+        </span>
       </div>
 
       <div className="flex items-center gap-6">
@@ -40,13 +68,33 @@ export const SystemBar: React.FC = () => {
 
         <button 
           onClick={toggleBill}
-          className={`flex items-center gap-2 pl-1 pr-3 py-1 rounded-full border transition-all group ${isBillOpen ? 'bg-indigo-500/30 border-indigo-400/50' : 'bg-indigo-500/20 hover:bg-indigo-500/30 border-indigo-400/30'}`}
+          className="flex items-center gap-2 pl-1 pr-3 py-1 transition-all group"
+          style={{
+            borderRadius: parcGlass.radius.pill,
+            background: isBillOpen ? parcGlass.colors.electricIndigo.glow : 'hsla(245, 90%, 65%, 0.2)',
+            border: isBillOpen ? parcGlass.borders.accent : '1px solid hsla(245, 90%, 65%, 0.3)',
+          }}
           data-testid="button-bill-toggle"
         >
-          <div className="p-1 rounded-full bg-indigo-500/80 text-white shadow-lg shadow-indigo-500/40">
+          <div 
+            className="p-1 text-white"
+            style={{
+              borderRadius: parcGlass.radius.full,
+              background: parcGlass.colors.electricIndigo[500],
+              boxShadow: parcGlass.shadows.bloom.indigo,
+            }}
+          >
             <Bot className="w-3 h-3" />
           </div>
-          <span className="text-xs font-semibold text-indigo-100 group-hover:text-white transition-colors">BILL</span>
+          <span 
+            className="font-semibold group-hover:text-white transition-colors"
+            style={{
+              fontSize: parcGlass.typography.fontSize.xs,
+              color: parcGlass.colors.electricIndigo[100],
+            }}
+          >
+            BILL
+          </span>
         </button>
 
         <UserMenu isOpen={userMenuOpen} onToggle={() => setUserMenuOpen(!userMenuOpen)} />

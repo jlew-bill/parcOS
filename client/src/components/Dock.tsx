@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, GraduationCap, LayoutGrid, Settings, DollarSign, FolderGit2, Globe, X, Tv } from 'lucide-react';
 import { useParcOSStore } from '@/state/store';
 import { nanoid } from 'nanoid';
+import { parcGlass, glassStyles } from '@/design/parcGlass';
 
 export const Dock: React.FC = () => {
   const addCard = useParcOSStore(state => state.addCard);
@@ -133,7 +134,8 @@ export const Dock: React.FC = () => {
 
   return (
     <motion.div 
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
+      className="fixed bottom-6 left-1/2 -translate-x-1/2"
+      style={{ zIndex: parcGlass.zIndex.dock }}
       onMouseEnter={() => setDockVisible(true)}
       onMouseLeave={() => setDockVisible(false)}
       animate={{ 
@@ -146,7 +148,11 @@ export const Dock: React.FC = () => {
       data-testid="dock-container"
     >
       <motion.div 
-        className="flex items-end gap-2 px-3 py-2 rounded-2xl glass-panel border-white/10 bg-black/20 backdrop-blur-md shadow-lg"
+        className="flex items-end gap-2 px-4 py-2.5"
+        style={{
+          ...glassStyles.dock,
+          borderRadius: parcGlass.radius.pill,
+        }}
         layout
       >
         {dockItems.map((item) => (
@@ -222,14 +228,28 @@ interface DockItemProps {
 const DockItem: React.FC<DockItemProps> = ({ icon: Icon, label, onClick, 'data-testid': testId }) => {
   return (
     <motion.button
-      whileHover={{ scale: 1.2, y: -10 }}
-      whileTap={{ scale: 0.95 }}
+      whileHover={parcGlass.motion.variants.hoverLift}
+      whileTap={parcGlass.motion.variants.tapPress}
       onClick={onClick}
-      className="group relative flex flex-col items-center justify-center w-12 h-12 rounded-2xl bg-white/5 hover:bg-white/15 border border-white/5 hover:border-white/30 transition-all duration-200"
+      className="group relative flex flex-col items-center justify-center w-12 h-12 transition-all duration-200"
+      style={{
+        background: parcGlass.colors.mistGlass.light,
+        borderRadius: parcGlass.radius.dockIcon,
+        border: parcGlass.borders.thin,
+        boxShadow: parcGlass.shadows.dockIcon.idle,
+      }}
       data-testid={testId}
     >
       <Icon className="w-6 h-6 text-white/80 group-hover:text-white drop-shadow-md" />
-      <span className="absolute -bottom-8 px-2 py-1 rounded-md bg-black/80 text-[10px] font-medium text-white opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-white/10 pointer-events-none">
+      <span 
+        className="absolute -bottom-9 px-3 py-1.5 text-[10px] font-medium text-white opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none"
+        style={{
+          background: parcGlass.colors.cosmicNight[800],
+          borderRadius: parcGlass.radius.sm,
+          border: parcGlass.borders.thin,
+          backdropFilter: parcGlass.blur.md,
+        }}
+      >
         {label}
       </span>
       <div className="absolute -bottom-2 w-1 h-1 rounded-full bg-white/30 group-hover:bg-white/80 opacity-0 group-hover:opacity-100 transition-all" />

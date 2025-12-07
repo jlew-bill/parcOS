@@ -5,6 +5,7 @@ import { useParcOSStore } from '@/state/store';
 import { Minimize2, GripHorizontal, Play, X, Link2 } from 'lucide-react';
 import { cmfkEngine } from '@/services/cmfk-engine';
 import { appRegistry } from '@/services/app-registry';
+import { parcGlass, glassStyles, getWindowStyle } from '@/design/parcGlass';
 
 const MIN_WIDTH = 280;
 const MIN_HEIGHT = 200;
@@ -93,43 +94,25 @@ export const ParcCardView: React.FC<{ card: ParcCard }> = ({ card }) => {
   const maxZ = 10;
   const depthFactor = Math.min(Math.max(card.position.z / maxZ, 0.3), 1);
   
+  const getWindowStyles = () => {
+    const baseStyle = getWindowStyle(isFocused, isGlobalCinemaMode);
+    return baseStyle;
+  };
+
   const getBackdropBlur = () => {
-    if (isGlobalCinemaMode) return 'blur(60px)';
-    if (isFocused) return `blur(${32 + depthFactor * 16}px)`;
-    return `blur(${16 + depthFactor * 8}px)`;
+    if (isGlobalCinemaMode) return parcGlass.blur.modal;
+    if (isFocused) return parcGlass.blur['3xl'];
+    return parcGlass.blur.xl;
   };
 
   const getCardShadow = () => {
     if (isGlobalCinemaMode) {
-      return [
-        `0 8px 16px rgba(0, 0, 0, 0.35)`,
-        `0 24px 48px rgba(0, 0, 0, 0.45)`,
-        `0 48px 96px rgba(0, 0, 0, 0.55)`,
-        `0 0 120px rgba(99, 102, 241, 0.7)`,
-        `0 0 200px rgba(139, 92, 246, 0.5)`,
-        `0 0 300px rgba(79, 70, 229, 0.3)`,
-        `inset 0 1px 0 rgba(255, 255, 255, 0.2)`,
-        `inset 0 -2px 6px rgba(0, 0, 0, 0.3)`
-      ].join(', ');
+      return parcGlass.shadows.window.cinema;
     }
     if (isFocused) {
-      return [
-        `0 4px 8px rgba(0, 0, 0, ${0.18 * depthFactor})`,
-        `0 12px 24px rgba(0, 0, 0, ${0.25 * depthFactor})`,
-        `0 24px 48px rgba(0, 0, 0, ${0.3 * depthFactor})`,
-        `0 0 60px rgba(99, 102, 241, ${0.5 * depthFactor})`,
-        `0 0 100px rgba(139, 92, 246, ${0.35 * depthFactor})`,
-        `inset 0 1px 0 rgba(255, 255, 255, 0.15)`,
-        `inset 0 -1px 4px rgba(0, 0, 0, 0.2)`
-      ].join(', ');
+      return parcGlass.shadows.window.focused;
     }
-    return [
-      `0 2px 4px rgba(0, 0, 0, ${0.1 * depthFactor})`,
-      `0 6px 12px rgba(0, 0, 0, ${0.12 * depthFactor})`,
-      `0 12px 24px rgba(0, 0, 0, ${0.15 * depthFactor})`,
-      `inset 0 1px 0 rgba(255, 255, 255, 0.05)`,
-      `inset 0 -1px 2px rgba(0, 0, 0, 0.1)`
-    ].join(', ');
+    return parcGlass.shadows.window.unfocused;
   };
 
   const handleResizeStart = useCallback((edge: string) => (e: React.PointerEvent) => {
@@ -206,23 +189,25 @@ export const ParcCardView: React.FC<{ card: ParcCard }> = ({ card }) => {
 
   const laneOpacity = card.metadata?.laneOpacity ?? 1;
 
+  const windowStyle = getWindowStyles();
+
   return (
     <motion.div
-      className={`absolute flex flex-col rounded-[32px] overflow-visible transition-shadow duration-300 ${
-        isFocused 
-          ? 'ring-1 ring-white/40' 
-          : 'ring-1 ring-white/10'
-      } ${isResizing ? 'ring-2 ring-indigo-400/60' : ''}`}
+      className={`absolute flex flex-col overflow-visible transition-all duration-300 ${
+        isResizing ? 'ring-2 ring-indigo-400/60' : ''
+      }`}
       style={{
         width: card.size.width,
         height: card.size.height,
         x: card.position.x,
         y: card.position.y,
-        zIndex: isGlobalCinemaMode ? 1000 : card.position.z,
-        backgroundColor: isFocused ? 'rgba(20, 20, 25, 0.75)' : 'rgba(20, 20, 25, 0.6)',
+        zIndex: isGlobalCinemaMode ? parcGlass.zIndex.cinema : card.position.z,
+        background: windowStyle.background,
         boxShadow: getCardShadow(),
         backdropFilter: getBackdropBlur(),
         WebkitBackdropFilter: getBackdropBlur(),
+        borderRadius: parcGlass.radius.window,
+        border: isFocused ? parcGlass.borders.default : parcGlass.borders.thin,
         opacity: isGlobalCinemaMode ? 1 : (isFocused ? 1 : laneOpacity * 0.88),
       }}
       drag={!isResizing}
@@ -264,7 +249,15 @@ export const ParcCardView: React.FC<{ card: ParcCard }> = ({ card }) => {
       data-card-z={card.position.z}
     >
       {/* Header / Handle */}
-      <div className="h-12 flex items-center justify-between px-4 shrink-0 border-b border-white/5 bg-white/5 cursor-grab active:cursor-grabbing group">
+      <div 
+        className="h-12 flex items-center justify-between px-4 shrink-0 cursor-grab active:cursor-grabbing group"
+        style={{
+          background: parcGlass.colors.gradients.windowChrome,
+          borderBottom: parcGlass.borders.thin,
+          borderTopLeftRadius: parcGlass.radius.window,
+          borderTopRightRadius: parcGlass.radius.window,
+        }}
+      >
         <div className="flex items-center gap-3">
           <motion.div 
             className="flex gap-2"
@@ -352,7 +345,15 @@ export const ParcCardView: React.FC<{ card: ParcCard }> = ({ card }) => {
       </div>
 
       {/* CMFK Indicator (Footer) */}
-      <div className="h-8 shrink-0 border-t border-white/5 bg-black/20 flex items-center px-4 justify-between rounded-b-[32px]">
+      <div 
+        className="h-8 shrink-0 flex items-center px-4 justify-between"
+        style={{
+          background: 'hsla(240, 15%, 6%, 0.5)',
+          borderTop: parcGlass.borders.thin,
+          borderBottomLeftRadius: parcGlass.radius.window,
+          borderBottomRightRadius: parcGlass.radius.window,
+        }}
+      >
           <div className="flex items-center gap-2">
             <div className="w-1.5 h-1.5 rounded-full bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.6)]"></div>
             <span className="text-[10px] font-mono text-blue-300/80 uppercase tracking-widest" data-testid={`text-cmfk-${card.id}`}>
