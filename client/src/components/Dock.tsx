@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, GraduationCap, LayoutGrid, Settings, DollarSign, FolderGit2, Globe, X } from 'lucide-react';
+import { Trophy, GraduationCap, LayoutGrid, Settings, DollarSign, FolderGit2, Globe, X, Tv } from 'lucide-react';
 import { useParcOSStore } from '@/state/store';
 import { nanoid } from 'nanoid';
 
@@ -21,6 +21,7 @@ export const Dock: React.FC = () => {
   const [expandMinimized, setExpandMinimized] = useState(false);
 
   const dockItems = [
+    { id: 'parcbar', icon: Tv, label: 'parcBar', app: 'parcbar-sports', workspace: 'PARCBAR', stack: 'parcbar', isPremium: true, tier: 'early_access' },
     { id: 'sports', icon: Trophy, label: 'Sports', app: 'sports-multiview', workspace: 'SPORTS', stack: 'sports', isPremium: false },
     { id: 'nil', icon: DollarSign, label: 'NIL', app: 'nil-dashboard', workspace: 'NIL', stack: 'nil', isPremium: true, tier: 'athlete_pro' },
     { id: 'class', icon: GraduationCap, label: 'Classroom', app: 'classroom-board', workspace: 'CLASSROOM', stack: 'classroom', isPremium: false },
@@ -28,6 +29,21 @@ export const Dock: React.FC = () => {
     { id: 'creator', icon: LayoutGrid, label: 'Creator', app: 'creator-studio', workspace: null, stack: null, isPremium: true, tier: 'creator_pro' },
     { id: 'system', icon: Settings, label: 'System', app: 'system-tools', workspace: null, stack: null, isPremium: false },
   ];
+
+  // Global keyboard shortcut for parcBar (Ctrl+Shift+S)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'S') {
+        e.preventDefault();
+        const parcBarItem = dockItems.find(item => item.id === 'parcbar');
+        if (parcBarItem) {
+          handleLaunch(parcBarItem);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const handleLaunch = (item: typeof dockItems[0]) => {
     // In a real app, check user subscription here

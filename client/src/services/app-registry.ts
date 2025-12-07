@@ -156,6 +156,10 @@ const GenericBrowserCard = React.lazy(() =>
   import('@/apps/GenericBrowserCard').then((m) => ({ default: m.GenericBrowserCard }))
 );
 
+const ParcBar = React.lazy(() =>
+  import('@/apps/ParcBar').then((m) => ({ default: m.ParcBar }))
+);
+
 const CreatorStudioPlaceholder: React.FC<{ payload: any; cardId: string }> = () =>
   React.createElement('div', { className: 'p-8 text-white/50 text-center' }, 'Creator Studio Placeholder');
 
@@ -218,4 +222,14 @@ appRegistry.register({
   category: 'system',
   defaultSize: { width: 400, height: 350 },
   component: SystemToolsPlaceholder,
+});
+
+appRegistry.register({
+  id: 'parcbar-sports',
+  name: 'parcBar Sports',
+  icon: 'Tv',
+  category: 'sports',
+  defaultSize: { width: 900, height: 600 },
+  component: ParcBar,
+  cmfkWeights: { view: 0.02, hover: 0.01, click: 0.03, success: 0.12 },
 });
