@@ -1,0 +1,216 @@
+Got you. Here’s one single chunk you can paste into Replit as a BILL-style build prompt.
+
+This assumes your repo already has the parcOS shell, Zustand store, CMFK, App Registry, BILL overlay, etc. The prompt tells Replit to add a hybrid spatial layer without wrecking the existing structure.
+
+⸻
+
+🟣 BILL SPATIAL ENGINE PROMPT (HYBRID VISIONOS LAYER)
+
+Paste everything below into Replit Agent:
+
+⸻
+
+You are BILL, systems architect for parcOS.
+
+The project already has a stable OS shell (cards, dock, SystemBar, BILL overlay, workspaces, CMFK, App Registry, engine files, etc.).
+Your task is to add a hybrid spatial “VisionOS-like” environment on top of the existing structure without refactoring or breaking anything.
+
+You MUST:
+	•	Keep the current 2D React + Zustand + Framer Motion UI fully working.
+	•	Add a 3D spatial layer behind/around it using React Three Fiber.
+	•	Make the spatial layer aware of CMFK state so the world reflects Fog/Misconception/Knowingness.
+	•	Keep changes modular and reversible (/spatial folder, minimal touchpoints).
+	•	Respect file structure that already exists (detect root app entry and integrate cleanly).
+
+Do NOT:
+	•	Rewrite the window manager, store, or engine.
+	•	Change existing public types/interfaces unless extending with optional fields.
+	•	Introduce breaking changes to BILL commands or App Registry.
+
+⸻
+
+1. Dependencies
+
+First, ensure required dependencies are installed (skip if already present):
+	•	three
+	•	@react-three/fiber
+	•	@react-three/drei
+	•	@react-spring/three (for smooth camera/card motion)
+
+Add them via package.json or install commands as appropriate for this Replit project.
+
+⸻
+
+2. Create the Spatial Module
+
+Create a new folder:
+	•	client/src/spatial/ (or src/spatial/ depending on current structure)
+
+Add the following files (adjust import paths based on detected root):
+	1.	spatial/SpatialScene.tsx
+	•	Exports a <SpatialScene /> component that renders a Three.js scene using <Canvas> from @react-three/fiber.
+	•	Responsibilities:
+	•	Set up camera: e.g. position={[0, 1.5, 3]}, fov={55}.
+	•	Lighting: key light, fill light, and soft ambient.
+	•	Background: gradient or environment map using Environment from @react-three/drei.
+	•	Add a subtle fog or volumetric feel for depth.
+	2.	spatial/BillOrb.tsx
+	•	A small floating “BILL orb” mesh:
+	•	sphereGeometry with emissive material.
+	•	Idle pulsing animation using react-spring or frame-based updates.
+	•	Positioned slightly above and in front of the user (e.g. [0, 1.4, -1]).
+	•	Later, this can be hooked to voice/LLM events, but for now it should just visibly “breathe”.
+	3.	spatial/SpatialDock.tsx
+	•	A curved 3D bar that visually corresponds to the existing dock:
+	•	Use a slightly curved plane mesh or a series of rounded boxes.
+	•	Optionally place small icon placeholders as 3D meshes aligned with the existing DOM dock icons.
+	•	This is visual only; DOM dock remains the interactive one.
+	4.	spatial/WorkspaceRooms.tsx
+	•	Defines logical “rooms” in 3D associated with workspaces:
+	•	SPORTS, NIL, CREATOR, SYSTEM, etc.
+	•	Exports a component that:
+	•	Reads activeWorkspace from the existing Zustand store.
+	•	Animates the camera and/or room lighting slightly when the workspace changes.
+	•	No UI logic changes, just camera/lighting changes.
+	5.	spatial/useSpatialCamera.ts
+	•	A hook that:
+	•	Subscribes to Zustand for activeWorkspace.
+	•	Controls the R3F camera (via useThree or useFrame) to smoothly move between workspace “positions” defined in a mapping, e.g.:
+
+const workspacePositions: Record<string, [number, number, number]> = {
+  SPORTS: [0, 1.5, 3],
+  NIL: [3, 1.5, 3],
+  CREATOR: [-3, 1.5, 3],
+  SYSTEM: [0, 2, 5],
+};
+
+
+	•	Uses tweening/spring for smooth transitions.
+
+⸻
+
+3. Wire CMFK Shape Engine to Spatial Effects
+
+Locate the existing CMFK state/engine (e.g. state/cmfk.ts, cmfk-engine.ts, or similar).
+Add a read-only selector hook for the global or dominant CMFK state:
+	•	Either overall OS CMFK
+	•	Or an aggregate of currently focused / active cards
+
+Expose via Zustand:
+	•	selectGlobalCmfk() or similar.
+
+In /spatial/SpatialScene.tsx:
+	•	Read CMFK values and map them to world parameters:
+	•	Fog (F):
+	•	Increase environmental fog density or haze as F increases.
+	•	Misconception (M):
+	•	Slightly warp or shake the background or add a subtle chromatic aberration effect.
+	•	Knowingness (K):
+	•	Increase overall brightness/intensity of key light as K rises.
+	•	Correctness (C):
+	•	Add a calm, stable “glow” around the BILL orb or brighten a “path” in the scene.
+
+Keep these effects subtle and non-distracting; they should feel like mood / ambience tied to the OS’s understanding.
+
+⸻
+
+4. Integrate Spatial Layer with Existing App Root
+
+Find the current React root, e.g.:
+	•	client/src/main.tsx and client/src/App.tsx
+	•	or similar entrypoint.
+
+Modify the root so that:
+	•	<SpatialScene /> is rendered underneath the existing 2D OS.
+	•	The existing App (parcOS desktop, cards, dock, BILL overlay) renders on top using regular DOM.
+
+Example structure (pseudo-code):
+
+function Root() {
+  return (
+    <div className="parc-root">
+      <div className="parc-spatial-layer">
+        <SpatialScene />
+      </div>
+      <div className="parc-ui-layer">
+        <App /> {/* existing parcOS UI */}
+      </div>
+    </div>
+  );
+}
+
+Add CSS to ensure:
+	•	Spatial layer covers full viewport and sits behind (z-index: 0).
+	•	UI layer is on top (z-index: 10) and pointer events are not blocked.
+
+Ensure the 3D canvas is positioned absolutely/fixed, full screen, no scrollbars.
+
+⸻
+
+5. Add Parallax + Tilt to Existing Cards (2.5D Effect)
+
+Without changing the card logic, upgrade the card component (e.g. ParcCard, CardWindow, or equivalent) so that:
+	•	It reacts to pointer or cursor position with a slight tilt and parallax:
+	•	Use Framer Motion or CSS transforms:
+	•	rotateX, rotateY, and small translateZ/scale.
+	•	Constrain the max tilt to something gentle (e.g. 8–10 degrees).
+	•	Optionally, use the lane (focus/work/archive) or CMFK state to modulate depth:
+	•	Focus lane → stronger parallax, brighter shadow.
+	•	Archive lane → flatter, dimmer.
+
+This keeps all interactions DOM-based but makes the OS feel spatially alive and VisionOS-like.
+
+⸻
+
+6. Add a Toggle and Settings Hook (Non-Destructive)
+
+Add a simple feature flag in the Zustand store, e.g.:
+
+spatialEnabled: true;
+toggleSpatial(): void;
+
+Wire it to:
+	•	A small control in SystemBar (e.g. “Spatial: On/Off”) for debugging.
+	•	When disabled, don’t render <SpatialScene /> to save GPU/battery.
+
+This ensures the spatial features are optional and safe.
+
+⸻
+
+7. Testing and Verification
+
+Implement/check the following:
+	1.	App builds and runs without TypeScript errors.
+	2.	Existing 2D parcOS behavior remains unchanged:
+	•	Dock icons still launch apps.
+	•	BILL overlay still toggles.
+	•	Cards still drag, resize, minimize, and snap correctly.
+	3.	Spatial layer:
+	•	3D scene visible behind OS.
+	•	BILL orb floating and pulsing.
+	•	Camera moves when activeWorkspace changes.
+	4.	CMFK integration:
+	•	Changing CMFK values (simulate via a dev command) visibly alters scene ambience (fog/brightness/orb intensity).
+	5.	Spatial toggle:
+	•	Turning spatial off completely removes the 3D canvas without breaking UI.
+
+Document in a short comment block at the top of SpatialScene.tsx how to extend the spatial behavior in the future (e.g. 3D windows, cinema room, etc.).
+
+⸻
+
+8. Constraints and Style
+	•	Use TypeScript throughout.
+	•	Keep all new types and hooks in /spatial or existing /state folders as appropriate.
+	•	No intrusive changes to engine, App Registry, or BILL commands—only read from them.
+	•	Maintain the current visual style (dark mode, glassmorphism).
+	•	Prefer small, composable components over one giant file.
+
+⸻
+
+End of instructions.
+
+Execute this plan and then summarize:
+	1.	Files created/modified.
+	2.	How to enable/disable the spatial layer.
+	3.	How CMFK currently influences the 3D world.
+	4.	Any recommendations for future “full 3D window” evolution.
