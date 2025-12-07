@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Dock } from '@/components/Dock';
 import { Canvas } from '@/components/Canvas';
 import { BillOverlay } from '@/components/BillOverlay';
+import { BillPresence } from '@/components/BillPresence';
 import { SpatialHUD } from '@/components/SpatialHUD';
 import { AnimatedBackground } from '@/components/AnimatedBackground';
 import { SpatialShell } from '@/spatial';
@@ -75,6 +76,7 @@ function App() {
       <SpatialHUD />
       <Dock />
       <BillOverlay />
+      <BillPresence />
       <Toaster />
     </div>
   );

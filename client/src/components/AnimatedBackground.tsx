@@ -102,9 +102,17 @@ const FlowLine: React.FC<{ index: number; theme: BackgroundTheme; time: number }
   const yOffset = 15 + index * 20;
   const phase = time * 0.3 + index * 0.5;
   
+  const y1 = yOffset;
+  const y2 = yOffset + Math.sin(phase * 2) * 8;
+  const y3 = yOffset + Math.cos(phase) * 5;
+  const y4 = yOffset + Math.sin(phase * 1.5) * 6;
+  const x2 = 25 + Math.sin(phase) * 10;
+  
   return (
     <svg
       className="absolute inset-0 w-full h-full pointer-events-none"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
       style={{ opacity: 0.6, mixBlendMode: 'screen' }}
     >
       <defs>
@@ -116,13 +124,11 @@ const FlowLine: React.FC<{ index: number; theme: BackgroundTheme; time: number }
         </linearGradient>
       </defs>
       <path
-        d={`M 0 ${yOffset}% 
-            Q ${25 + Math.sin(phase) * 10}% ${yOffset + Math.sin(phase * 2) * 8}%, 
-              50% ${yOffset + Math.cos(phase) * 5}% 
-            T 100% ${yOffset + Math.sin(phase * 1.5) * 6}%`}
+        d={`M 0 ${y1} Q ${x2} ${y2}, 50 ${y3} T 100 ${y4}`}
         fill="none"
         stroke={`url(#flowGrad-${index})`}
-        strokeWidth="2"
+        strokeWidth="0.5"
+        vectorEffect="non-scaling-stroke"
         style={{
           filter: 'blur(4px)',
         }}

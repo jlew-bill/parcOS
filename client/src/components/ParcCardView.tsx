@@ -266,23 +266,37 @@ export const ParcCardView: React.FC<{ card: ParcCard }> = ({ card }) => {
       {/* Header / Handle */}
       <div className="h-12 flex items-center justify-between px-4 shrink-0 border-b border-white/5 bg-white/5 cursor-grab active:cursor-grabbing group">
         <div className="flex items-center gap-3">
-          <div className="flex gap-2 group-hover:opacity-100 opacity-50 transition-opacity">
-             <button 
-               className="w-3 h-3 rounded-full bg-red-500/80 hover:bg-red-500 border border-white/10 transition-colors" 
+          <motion.div 
+            className="flex gap-2"
+            initial={{ opacity: 0.5 }}
+            whileHover={{ opacity: 1 }}
+            transition={{ duration: 0.15 }}
+          >
+             <motion.button 
+               className="w-3 h-3 rounded-full bg-red-500/80 hover:bg-red-500 border border-white/10" 
                data-testid={`button-close-${card.id}`}
-               onClick={(e) => { e.stopPropagation(); closeCard(card.id); }} 
+               onClick={(e) => { e.stopPropagation(); closeCard(card.id); }}
+               whileHover={{ scale: 1.2, boxShadow: '0 0 8px rgba(239, 68, 68, 0.6)' }}
+               whileTap={{ scale: 0.9 }}
+               transition={{ type: 'spring', stiffness: 400, damping: 17 }}
              />
-             <button 
-               className="w-3 h-3 rounded-full bg-yellow-500/80 hover:bg-yellow-500 border border-white/10 transition-colors" 
+             <motion.button 
+               className="w-3 h-3 rounded-full bg-yellow-500/80 hover:bg-yellow-500 border border-white/10" 
                data-testid={`button-minimize-${card.id}`}
                onClick={() => minimizeCard(card.id)}
+               whileHover={{ scale: 1.2, boxShadow: '0 0 8px rgba(234, 179, 8, 0.6)' }}
+               whileTap={{ scale: 0.9 }}
+               transition={{ type: 'spring', stiffness: 400, damping: 17 }}
              />
-             <button 
-               className="w-3 h-3 rounded-full bg-green-500/80 hover:bg-green-500 border border-white/10 transition-colors" 
+             <motion.button 
+               className="w-3 h-3 rounded-full bg-green-500/80 hover:bg-green-500 border border-white/10" 
                data-testid={`button-maximize-${card.id}`}
-               onClick={(e) => { e.stopPropagation(); handleDoubleClick(); }} 
+               onClick={(e) => { e.stopPropagation(); handleDoubleClick(); }}
+               whileHover={{ scale: 1.2, boxShadow: '0 0 8px rgba(34, 197, 94, 0.6)' }}
+               whileTap={{ scale: 0.9 }}
+               transition={{ type: 'spring', stiffness: 400, damping: 17 }}
              />
-          </div>
+          </motion.div>
         </div>
         
         <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 opacity-70">

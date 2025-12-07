@@ -188,7 +188,14 @@ export const Dock: React.FC = () => {
   );
 };
 
-const DockItem: React.FC<{ icon: React.ElementType, label: string, onClick: () => void, 'data-testid'?: string }> = ({ icon: Icon, label, onClick, 'data-testid': testId }) => {
+interface DockItemProps {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  onClick: () => void;
+  'data-testid'?: string;
+}
+
+const DockItem: React.FC<DockItemProps> = ({ icon: Icon, label, onClick, 'data-testid': testId }) => {
   return (
     <motion.button
       whileHover={{ scale: 1.2, y: -10 }}

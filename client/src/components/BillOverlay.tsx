@@ -1,16 +1,82 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bot, Sparkles, ArrowRight, Mic, CheckCircle, XCircle, Command } from 'lucide-react';
+import { Bot, Sparkles, ArrowRight, Mic, CheckCircle, XCircle, Command, Zap, Layout, Layers, Play } from 'lucide-react';
 import { useParcOSStore } from '@/state/store';
 import { BillCommandProcessor, CommandResult } from '@/services/bill-commands';
+
+const contextualGreetings = [
+  "What would you like to build?",
+  "I'm here to help organize your workspace.",
+  "Ready when you are.",
+  "Let's make something great.",
+];
 
 export const BillOverlay: React.FC = () => {
   const isOpen = useParcOSStore(state => state.isBillOpen);
   const toggleBill = useParcOSStore(state => state.toggleBill);
+  const cards = useParcOSStore(state => state.cards);
+  const minimizedCards = useParcOSStore(state => state.minimizedCards);
+  const focusedCardId = useParcOSStore(state => state.focusedCardId);
+  const highlightedTeam = useParcOSStore(state => state.highlightedTeam);
+  
   const [query, setQuery] = useState('');
   const [response, setResponse] = useState<CommandResult | null>(null);
   const [isExecuting, setIsExecuting] = useState(false);
+  const [greeting] = useState(() => contextualGreetings[Math.floor(Math.random() * contextualGreetings.length)]);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const visibleCards = useMemo(() => 
+    Object.values(cards).filter(c => !minimizedCards.includes(c.id)),
+    [cards, minimizedCards]
+  );
+
+  const contextualSuggestions = useMemo(() => {
+    const suggestions: Array<{ text: string; command: string; icon: React.ReactNode; priority: number }> = [];
+    
+    if (visibleCards.length === 0) {
+      suggestions.push(
+        { text: 'Launch Sports', command: 'launch sports', icon: <Play className="w-3 h-3" />, priority: 10 },
+        { text: 'Launch NIL Dashboard', command: 'launch nil dashboard', icon: <Play className="w-3 h-3" />, priority: 9 },
+        { text: 'Launch Classroom', command: 'launch classroom', icon: <Play className="w-3 h-3" />, priority: 8 }
+      );
+    } else {
+      if (visibleCards.length >= 3) {
+        suggestions.push(
+          { text: 'Arrange workspace', command: 'arrange workspace', icon: <Layout className="w-3 h-3" />, priority: 10 },
+          { text: 'Grid layout', command: 'grid layout', icon: <Layers className="w-3 h-3" />, priority: 9 }
+        );
+      }
+      
+      if (focusedCardId) {
+        suggestions.push(
+          { text: 'Snap left', command: 'snap left', icon: <Zap className="w-3 h-3" />, priority: 7 },
+          { text: 'Snap right', command: 'snap right', icon: <Zap className="w-3 h-3" />, priority: 6 }
+        );
+      }
+
+      const hasSportsCard = visibleCards.some(c => c.appId === 'sports-multiview');
+      const hasNILCard = visibleCards.some(c => c.appId === 'nil-dashboard');
+      
+      if (hasSportsCard && !hasNILCard) {
+        suggestions.push({ text: 'Launch NIL Dashboard', command: 'launch nil dashboard', icon: <Play className="w-3 h-3" />, priority: 8 });
+      }
+      if (hasNILCard && !hasSportsCard) {
+        suggestions.push({ text: 'Launch Sports', command: 'launch sports', icon: <Play className="w-3 h-3" />, priority: 8 });
+      }
+
+      if (highlightedTeam) {
+        suggestions.push({ text: 'Clear team link', command: 'clear link', icon: <XCircle className="w-3 h-3" />, priority: 5 });
+      }
+    }
+
+    if (minimizedCards.length > 0) {
+      suggestions.push({ text: `Restore ${minimizedCards.length} cards`, command: 'restore all', icon: <Layers className="w-3 h-3" />, priority: 4 });
+    }
+
+    suggestions.push({ text: 'Cascade', command: 'cascade', icon: <Layers className="w-3 h-3" />, priority: 3 });
+    
+    return suggestions.sort((a, b) => b.priority - a.priority).slice(0, 6);
+  }, [visibleCards, focusedCardId, minimizedCards, highlightedTeam]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -75,8 +141,6 @@ export const BillOverlay: React.FC = () => {
     executeCommand(command);
   };
 
-  const suggestions = BillCommandProcessor.getSuggestions();
-
   return (
     <AnimatePresence>
       {isOpen && (
@@ -121,7 +185,7 @@ export const BillOverlay: React.FC = () => {
                       exit={{ opacity: 0 }}
                       className="text-sm text-indigo-200/80"
                     >
-                      I can arrange your workspace, focus cards, or organize your layout. What do you need?
+                      {greeting}
                     </motion.p>
                   )}
                 </AnimatePresence>
@@ -159,16 +223,21 @@ export const BillOverlay: React.FC = () => {
             </form>
             
             <div className="flex flex-wrap gap-2 pb-1">
-              {suggestions.slice(0, 6).map(suggestion => (
+              {contextualSuggestions.map((suggestion, idx) => (
                 <motion.button 
                   key={suggestion.command} 
                   onClick={() => handleSuggestionClick(suggestion.command)}
-                  className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-indigo-600/30 border border-white/5 hover:border-indigo-500/30 text-xs text-white/70 hover:text-white whitespace-nowrap transition-all flex items-center gap-1.5"
-                  whileHover={{ scale: 1.02 }}
+                  className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-indigo-600/30 border border-white/5 hover:border-indigo-500/30 text-xs text-white/70 hover:text-white whitespace-nowrap transition-all flex items-center gap-1.5 group"
+                  whileHover={{ scale: 1.02, y: -1 }}
                   whileTap={{ scale: 0.98 }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.05 }}
                   data-testid={`button-suggestion-${suggestion.command.replace(/\s+/g, '-')}`}
                 >
-                  <Command className="w-3 h-3 text-indigo-400" />
+                  <span className="text-indigo-400 group-hover:text-indigo-300 transition-colors">
+                    {suggestion.icon}
+                  </span>
                   {suggestion.text}
                 </motion.button>
               ))}
