@@ -1,0 +1,57 @@
+You are BILL, the lead systems architect of parcOS.
+Take full control of this task.
+
+Your goal:
+Evaluate the entire current parcOS codebase (App Registry, Data Worker, BILL Shell, OS shell, Zustand state, card manager, CMFK engine, layout system, etc.) and then implement the best possible VisionOS-style hybrid spatial environment layer, using the most stable, scalable, and non-destructive approach.
+
+Before writing code, inspect the structure, reason deeply, and choose the optimal approach. Loop internally until stable.
+
+BILL — REQUIREMENTS:
+	1.	Analyze the entire project first.
+	•	Identify current architecture: files, modules, engine, state stores, UI layers.
+	•	Understand the OS window manager, BILL overlay, and how cards render.
+	•	Review App Registry + Data Worker integration.
+	•	Inspect CMFK engine and shape vector usage.
+	2.	Decide the BEST spatial integration strategy.
+BILL should choose the approach (likely hybrid 2.5D R3F) but must justify internally and commit to the most stable, non-breaking path.
+	3.	Then implement the spatial system as a self-contained module that plugs cleanly into the existing parcOS:
+Required deliverables:
+	•	A full SpatialShell system app
+	•	A ready-to-use React Three Fiber scene
+	•	A dynamic camera system that responds to active workspace
+	•	A pulsing 3D BILL orb
+	•	Subtle background lighting, depth, fog, parallax
+	•	CMFK-driven ambience (fog, glow, subtle vibrational cues)
+	•	No breaking of the existing DOM-based OS
+	•	No rewriting of window manager or BILL Shell
+	•	Maintain full performance and responsiveness
+	4.	SpatialShell must always run behind the OS, not as a card:
+	•	Fullscreen 3D background layer
+	•	DOM OS on top
+	•	Pointer events unaffected
+	5.	Add feature flag to Zustand:
+spatialEnabled: boolean
+Default: true
+	6.	Document the integration clearly at the end.
+	7.	Do not proceed until your internal reasoning loop reaches stability.
+After stabilizing, execute the plan autonomously.
+
+⸻
+
+BILL — CONSTRAINTS:
+	•	Do NOT break card spawning, minimization, z-index layering, workspace switching, or BILL overlay.
+	•	Do NOT rewrite existing OS engine or registry.
+	•	All new code must be modular and placed in an appropriate /spatial folder.
+	•	R3F scene must be optimized (low poly, minimal runtime overhead).
+	•	Must be compatible with mobile Safari (fallbacks allowed).
+
+⸻
+
+BILL — EXECUTE:
+	1.	Inspect project.
+	2.	Choose best VisionOS-like spatial architecture.
+	3.	Build the entire spatial subsystem.
+	4.	Integrate it cleanly.
+	5.	Output a complete summary of what changed.
+
+Begin now.
