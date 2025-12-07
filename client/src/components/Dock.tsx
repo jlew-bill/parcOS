@@ -111,11 +111,15 @@ export const Dock: React.FC = () => {
     }
   };
 
+  const [dockVisible, setDockVisible] = useState(false);
+
   return (
     <motion.div 
       className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
+      onMouseEnter={() => setDockVisible(true)}
+      onMouseLeave={() => setDockVisible(false)}
       animate={{ 
-        opacity: isInCinemaMode ? 0.1 : 1,
+        opacity: isInCinemaMode ? 0.1 : (dockVisible ? 1 : 0.15),
         y: isInCinemaMode ? 20 : 0,
         scale: isInCinemaMode ? 0.95 : 1
       }}
@@ -124,7 +128,7 @@ export const Dock: React.FC = () => {
       data-testid="dock-container"
     >
       <motion.div 
-        className="flex items-end gap-3 px-4 py-3 rounded-3xl glass-panel border-white/15 bg-black/30 backdrop-blur-2xl shadow-2xl"
+        className="flex items-end gap-2 px-3 py-2 rounded-2xl glass-panel border-white/10 bg-black/20 backdrop-blur-md shadow-lg"
         layout
       >
         {dockItems.map((item) => (

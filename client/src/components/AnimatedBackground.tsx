@@ -168,7 +168,7 @@ const DepthGrid: React.FC<{ theme: BackgroundTheme }> = ({ theme }) => {
 export const AnimatedBackground: React.FC = () => {
   const [time, setTime] = useState(0);
   const [theme, setTheme] = useState<BackgroundTheme>('cosmic');
-  const rafRef = useRef<number>();
+  const rafRef = useRef<number | null>(null);
   
   const shapes = useMemo(() => generateShapeVectors(12, theme), [theme]);
   
